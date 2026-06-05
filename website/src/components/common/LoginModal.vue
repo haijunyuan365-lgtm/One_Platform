@@ -21,9 +21,9 @@
           <div class="p-8">
             <!-- Header -->
             <div class="text-center mb-7">
-              <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-base mx-auto mb-4">A</div>
+              <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-base mx-auto mb-4">一</div>
               <h2 class="text-xl font-bold text-gray-900">欢迎回来</h2>
-              <p class="text-gray-400 text-sm mt-1">登录你的 AxureMart 账号</p>
+              <p class="text-gray-400 text-sm mt-1">登录你的公司一体化平台账号</p>
             </div>
 
             <!-- Form -->
@@ -95,10 +95,7 @@
               </p>
             </div>
 
-            <p class="text-center text-xs text-gray-400 mt-4">
-              还没有账号？
-              <button type="button" class="text-blue-600 hover:text-blue-700 font-medium">免费注册</button>
-            </p>
+            <p class="text-center text-xs text-gray-400 mt-4">账号开通或重置请联系管理员</p>
           </div>
         </div>
       </div>

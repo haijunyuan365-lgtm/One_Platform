@@ -1,0 +1,11 @@
+<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/>
+  <mxCell id="2" value="用户登录门户" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1"><mxGeometry x="60" y="80" width="130" height="50" as="geometry"/></mxCell>
+  <mxCell id="3" value="搜索或筛选项目" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="250" y="80" width="150" height="50" as="geometry"/></mxCell>
+  <mxCell id="4" value="点击授权项目卡片" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="460" y="80" width="170" height="50" as="geometry"/></mxCell>
+  <mxCell id="5" value="展示访问详情窗口" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1"><mxGeometry x="690" y="80" width="170" height="50" as="geometry"/></mxCell>
+  <mxCell id="6" value="打开地址或查看二维码" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;" vertex="1" parent="1"><mxGeometry x="920" y="80" width="180" height="50" as="geometry"/></mxCell>
+  <mxCell id="7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="2" target="3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="3" target="4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="4" target="5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="5" target="6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+</root></mxGraphModel>

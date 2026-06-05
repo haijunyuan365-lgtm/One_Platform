@@ -8,11 +8,11 @@ import type { Role, Menu } from '@/types/api'
 const mockRoles: Role[] = [
   {
     id: 1,
-    code: 'sys_admin',
-    name: '系统管理员',
-    description: '系统技术管理人员，拥有全量数据及系统管理功能权限',
-    menuIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    userCount: 2,
+    code: 'super_admin',
+    name: '超级管理员',
+    description: '平台最高权限，维护用户、部门、角色、项目资料、状态检测和审计日志',
+    menuIds: [1, 11, 12, 2, 21, 22, 3, 31, 32, 33, 34, 4, 41, 42, 5, 51, 52],
+    userCount: 1,
     sort: 1,
     status: 1,
     createTime: '2024-01-01 10:00:00',
@@ -20,11 +20,11 @@ const mockRoles: Role[] = [
   },
   {
     id: 2,
-    code: 'province_admin',
-    name: '省公司管理员',
-    description: '省公司级别的管理人员，可查看全省所有组织的风险数据',
-    menuIds: [1, 2, 3, 4],
-    userCount: 8,
+    code: 'project_admin',
+    name: '项目管理员',
+    description: '负责指定项目的卡片、访问资料、凭据、二维码和检测配置维护',
+    menuIds: [3, 31, 32, 33, 34, 4, 41, 42, 5, 52],
+    userCount: 6,
     sort: 2,
     status: 1,
     createTime: '2024-01-02 10:00:00',
@@ -32,11 +32,11 @@ const mockRoles: Role[] = [
   },
   {
     id: 3,
-    code: 'branch_admin',
-    name: '分公司管理员',
-    description: '分公司级别的管理人员，可查看本分公司及下属区/片公司、库站的风险数据',
-    menuIds: [1, 2, 3, 4],
-    userCount: 14,
+    code: 'dept_admin',
+    name: '部门管理员',
+    description: '查看本部门用户和授权项目，协助维护部门范围内的项目访问资料',
+    menuIds: [1, 11, 3, 31, 4, 42, 5, 52],
+    userCount: 8,
     sort: 3,
     status: 1,
     createTime: '2024-01-03 10:00:00',
@@ -44,11 +44,11 @@ const mockRoles: Role[] = [
   },
   {
     id: 4,
-    code: 'district_admin',
-    name: '区/片公司管理员',
-    description: '区/片公司级别的管理人员，可查看本区/片公司及下属库站的风险数据',
-    menuIds: [1, 2, 3],
-    userCount: 36,
+    code: 'employee',
+    name: '普通员工',
+    description: '使用前台项目门户查看授权项目入口和访问说明',
+    menuIds: [],
+    userCount: 80,
     sort: 4,
     status: 1,
     createTime: '2024-01-04 10:00:00',
@@ -56,11 +56,11 @@ const mockRoles: Role[] = [
   },
   {
     id: 5,
-    code: 'station_admin',
-    name: '库站管理员',
-    description: '库站级别的管理人员，可查看和维护本库站的风险数据',
-    menuIds: [1, 2, 3],
-    userCount: 120,
+    code: 'guest',
+    name: '访客用户',
+    description: '临时查看指定项目入口和基础说明，不授予后台维护权限',
+    menuIds: [],
+    userCount: 12,
     sort: 5,
     status: 1,
     createTime: '2024-01-05 10:00:00',
@@ -73,32 +73,66 @@ let nextRoleId = 6
 // 模拟菜单数据（简化版，实际应该从菜单管理获取）
 const mockMenus: Menu[] = [
   {
+    id: 1,
+    parentId: 0,
+    name: 'organizationTemplate',
+    title: '系统管理',
+    type: 'directory',
+    icon: 'OfficeBuilding',
+    path: '/organization-template',
+    sort: 1,
+    status: 1,
+    children: [
+      {
+        id: 11,
+        parentId: 1,
+        name: 'user',
+        title: '用户管理',
+        type: 'menu',
+        path: '/organization-template/user',
+        sort: 1,
+        status: 1
+      },
+      {
+        id: 12,
+        parentId: 1,
+        name: 'department',
+        title: '部门管理',
+        type: 'menu',
+        path: '/organization-template/department',
+        sort: 2,
+        status: 1
+      }
+    ]
+  },
+  {
     id: 2,
     parentId: 0,
-    name: 'report',
-    title: '报表中心',
+    name: 'permissionTemplate',
+    title: '权限管理',
     type: 'directory',
-    icon: '&#xe601;',
+    icon: 'Lock',
+    path: '/permission-template',
     sort: 2,
     status: 1,
     children: [
       {
         id: 21,
         parentId: 2,
-        name: 'inspectionStatistics',
-        title: '巡检统计',
+        name: 'role',
+        title: '角色管理',
         type: 'menu',
-        path: '/report/inspection-statistics',
+        path: '/permission-template/role',
         sort: 1,
         status: 1
       },
       {
         id: 22,
         parentId: 2,
-        name: 'equipmentStatistics',
-        title: '设备统计',
+        name: 'menu',
+        title: '菜单管理',
         type: 'menu',
-        path: '/report/equipment-statistics',
+        path: '/permission-template/menu',
         sort: 2,
         status: 1
       }
@@ -107,179 +141,117 @@ const mockMenus: Menu[] = [
   {
     id: 3,
     parentId: 0,
-    name: 'equipment',
-    title: '设备管理',
-    type: 'menu',
-    icon: '&#xe602;',
-    path: '/equipment',
+    name: 'project',
+    title: '项目管理',
+    type: 'directory',
+    icon: 'FolderOpened',
+    path: '/project',
     sort: 3,
-    status: 1
+    status: 1,
+    children: [
+      {
+        id: 31,
+        parentId: 3,
+        name: 'card',
+        title: '项目卡片管理',
+        type: 'menu',
+        path: '/project/card',
+        sort: 1,
+        status: 1
+      },
+      {
+        id: 32,
+        parentId: 3,
+        name: 'detailContent',
+        title: '详情内容管理',
+        type: 'menu',
+        path: '/project/detail-content',
+        sort: 2,
+        status: 1
+      },
+      {
+        id: 33,
+        parentId: 3,
+        name: 'credential',
+        title: '账号凭据管理',
+        type: 'menu',
+        path: '/project/credential',
+        sort: 3,
+        status: 1
+      },
+      {
+        id: 34,
+        parentId: 3,
+        name: 'qrcode',
+        title: '二维码管理',
+        type: 'menu',
+        path: '/project/qrcode',
+        sort: 4,
+        status: 1
+      }
+    ]
   },
   {
     id: 4,
     parentId: 0,
-    name: 'inspectionPoint',
-    title: '巡检点管理',
-    type: 'menu',
-    icon: '&#xe603;',
-    path: '/inspection-point',
+    name: 'status',
+    title: '状态检测',
+    type: 'directory',
+    icon: 'Monitor',
+    path: '/status',
     sort: 4,
-    status: 1
+    status: 1,
+    children: [
+      {
+        id: 41,
+        parentId: 4,
+        name: 'config',
+        title: '检测配置',
+        type: 'menu',
+        path: '/status/config',
+        sort: 1,
+        status: 1
+      },
+      {
+        id: 42,
+        parentId: 4,
+        name: 'record',
+        title: '检测记录',
+        type: 'menu',
+        path: '/status/record',
+        sort: 2,
+        status: 1
+      }
+    ]
   },
   {
     id: 5,
     parentId: 0,
-    name: 'inspection',
-    title: '巡检管理',
+    name: 'audit',
+    title: '权限与审计',
     type: 'directory',
-    icon: '&#xe604;',
+    icon: 'Operation',
+    path: '/audit',
     sort: 5,
     status: 1,
     children: [
       {
         id: 51,
         parentId: 5,
-        name: 'plan',
-        title: '巡检计划',
+        name: 'projectPermission',
+        title: '项目权限配置',
         type: 'menu',
-        path: '/inspection/plan',
+        path: '/audit/project-permission',
         sort: 1,
         status: 1
       },
       {
         id: 52,
         parentId: 5,
-        name: 'task',
-        title: '任务管理',
+        name: 'operationLog',
+        title: '操作日志',
         type: 'menu',
-        path: '/inspection/task',
-        sort: 2,
-        status: 1
-      }
-    ]
-  },
-  {
-    id: 6,
-    parentId: 0,
-    name: 'workOrder',
-    title: '工单管理',
-    type: 'menu',
-    icon: '&#xe605;',
-    path: '/work-order',
-    sort: 6,
-    status: 1
-  },
-  {
-    id: 7,
-    parentId: 0,
-    name: 'basic',
-    title: '基础管理',
-    type: 'directory',
-    icon: '&#xe606;',
-    sort: 7,
-    status: 1,
-    children: [
-      {
-        id: 71,
-        parentId: 7,
-        name: 'equipmentCategory',
-        title: '设备分类管理',
-        type: 'menu',
-        path: '/basic/equipment-category',
-        sort: 1,
-        status: 1
-      },
-      {
-        id: 72,
-        parentId: 7,
-        name: 'equipmentLevel',
-        title: '设备分级管理',
-        type: 'menu',
-        path: '/basic/equipment-level',
-        sort: 2,
-        status: 1
-      },
-      {
-        id: 73,
-        parentId: 7,
-        name: 'inspectionChecklist',
-        title: '检查项清单',
-        type: 'menu',
-        path: '/basic/inspection-checklist',
-        sort: 3,
-        status: 1
-      }
-    ]
-  },
-  {
-    id: 8,
-    parentId: 0,
-    name: 'organization',
-    title: '组织管理',
-    type: 'directory',
-    icon: '&#xe813;',
-    sort: 8,
-    status: 1,
-    children: [
-      {
-        id: 81,
-        parentId: 8,
-        name: 'department',
-        title: '部门管理',
-        type: 'menu',
-        path: '/organization/department',
-        sort: 1,
-        status: 1
-      },
-      {
-        id: 82,
-        parentId: 8,
-        name: 'user',
-        title: '用户管理',
-        type: 'menu',
-        path: '/organization/user',
-        sort: 2,
-        status: 1
-      },
-      {
-        id: 83,
-        parentId: 8,
-        name: 'position',
-        title: '岗位管理',
-        type: 'menu',
-        path: '/organization/position',
-        sort: 3,
-        status: 1
-      }
-    ]
-  },
-  {
-    id: 9,
-    parentId: 0,
-    name: 'permission',
-    title: '权限管理',
-    type: 'directory',
-    icon: '&#xe607;',
-    sort: 9,
-    status: 1,
-    children: [
-      {
-        id: 91,
-        parentId: 9,
-        name: 'role',
-        title: '角色管理',
-        type: 'menu',
-        path: '/permission/role',
-        sort: 1,
-        status: 1
-      },
-      {
-        id: 92,
-        parentId: 9,
-        name: 'menu',
-        title: '菜单管理',
-        type: 'menu',
-        path: '/permission/menu',
+        path: '/audit/operation-log',
         sort: 2,
         status: 1
       }

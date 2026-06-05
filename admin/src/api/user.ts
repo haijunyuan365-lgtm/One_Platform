@@ -9,6 +9,7 @@ import {
   deleteUser,
   batchDeleteUsers,
   updateUserStatus,
+  resetUserPassword,
   batchSetPosition,
   batchSetRole
 } from './organization'
@@ -19,10 +20,11 @@ export type { AdminUser } from '@/types/api'
 export const userApi = {
   getList: getUserList,
   add: (data: Partial<AdminUser>) => addUser(data),
-  update: (data: Partial<AdminUser> & { id: number }) => updateUser(data.id, data),
+  update: (data: Partial<AdminUser>) => updateUser(data.id!, data),
   delete: deleteUser,
   batchDelete: batchDeleteUsers,
-  updateStatus: updateUserStatus
+  updateStatus: updateUserStatus,
+  resetPassword: resetUserPassword
 }
 
 /**

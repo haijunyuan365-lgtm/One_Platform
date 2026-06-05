@@ -11,7 +11,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AppFooter: typeof import('./components/layout/AppFooter.vue')['default']
     AppHeader: typeof import('./components/layout/AppHeader.vue')['default']
     DefaultLayout: typeof import('./components/layout/DefaultLayout.vue')['default']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']

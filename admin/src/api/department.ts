@@ -9,13 +9,14 @@ import {
   deleteDepartment,
   updateDepartmentStatus
 } from './organization'
+import type { Department } from '@/types/api'
 
 export type { Department } from '@/types/api'
 
 export const departmentApi = {
   getList: getDepartmentList,
   add: addDepartment,
-  update: updateDepartment,
+  update: (data: Partial<Department>) => updateDepartment(data.id!, data),
   delete: deleteDepartment,
   updateStatus: updateDepartmentStatus
 }

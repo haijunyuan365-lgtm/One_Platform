@@ -1,292 +1,835 @@
 <template>
-  <!-- Hero -->
-  <section class="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white pt-24 pb-20">
-    <div class="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none"></div>
+  <section class="portal-shell">
+    <div v-if="toastMessage" class="portal-toast">{{ toastMessage }}</div>
 
-    <div class="relative max-w-7xl mx-auto px-6 lg:px-8">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-        <!-- Left -->
-        <div class="max-w-xl">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-medium mb-6">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
-            新一代 AI 智能体平台
+    <div class="portal-main">
+      <div class="portal-toolbar">
+        <div>
+          <p class="eyebrow">公司一体化平台</p>
+          <h1>项目统一门户</h1>
+        </div>
+        <div class="toolbar-stats">
+          <div>
+            <strong>{{ store.projects.length }}</strong>
+            <span>授权项目</span>
           </div>
-          <h1 class="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight mb-5">
-            部署你的<br />
-            <span class="text-blue-600">AI 智能体</span><br />
-            只需几分钟
-          </h1>
-          <p class="text-base text-gray-500 leading-relaxed mb-8">
-            AxureMart 让你无需编写代码，即可构建、训练和部署专属 AI 机器人。自动处理客服、销售、数据分析等各类业务场景。
-          </p>
-          <div class="flex flex-wrap gap-3">
-            <button class="px-6 py-3 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
-              免费创建智能体
+          <div>
+            <strong>{{ store.favoriteIds.length }}</strong>
+            <span>收藏</span>
+          </div>
+          <div>
+            <strong>{{ store.recentIds.length }}</strong>
+            <span>最近访问</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <input v-model="store.filters.keyword" class="filter-input" placeholder="搜索项目名称、简称、标签或说明" @keyup.enter="loadProjects" />
+        <select v-model="store.filters.category" class="filter-select">
+          <option value="">全部分类</option>
+          <option v-for="item in categoryOptions" :key="item" :value="item">{{ item }}</option>
+        </select>
+        <select v-model="store.filters.status" class="filter-select">
+          <option value="">全部状态</option>
+          <option v-for="item in statusOptions" :key="item" :value="item">{{ item }}</option>
+        </select>
+        <label class="favorite-toggle">
+          <input v-model="favoriteOnly" type="checkbox" />
+          仅看收藏
+        </label>
+        <button class="primary-btn" @click="loadProjects">查询</button>
+        <button class="ghost-btn" @click="resetFilters">重置</button>
+      </div>
+
+      <div class="content-grid">
+        <main class="project-zone">
+          <div v-if="store.loading" class="state-box">加载中...</div>
+          <div v-else-if="visibleProjects.length === 0" class="state-box">暂无可访问项目，请联系管理员授权</div>
+          <div v-else class="project-grid">
+            <article v-for="project in visibleProjects" :key="project.id" class="project-card">
+              <div class="card-head">
+                <img :src="project.logo" :alt="project.name" class="project-logo" />
+                <button class="icon-btn" :aria-label="store.isFavorite(project.id) ? '取消收藏' : '收藏项目'" @click="store.toggleFavorite(project.id)">
+                  {{ store.isFavorite(project.id) ? '★' : '☆' }}
+                </button>
+              </div>
+              <div class="card-title-line">
+                <h2>{{ project.name }}</h2>
+                <span :class="['status-pill', statusClass(project.status)]">{{ project.status }}</span>
+              </div>
+              <p class="project-desc">{{ project.description }}</p>
+              <div class="tag-row">
+                <span class="category-chip">{{ project.category }}</span>
+                <span v-for="tag in project.tags" :key="tag" class="tag-chip">{{ tag }}</span>
+              </div>
+              <div class="card-meta">
+                <span>维护人：{{ project.maintainer }}</span>
+                <span>{{ project.responseTime ? `${project.responseTime}ms` : '未检测' }}</span>
+              </div>
+              <button class="detail-btn" @click="openProject(project.id)">查看详情</button>
+            </article>
+          </div>
+        </main>
+
+        <aside class="side-zone">
+          <div class="side-panel">
+            <div class="panel-title">收藏项目</div>
+            <button v-for="project in store.favoriteProjects" :key="project.id" class="side-link" @click="openProject(project.id)">
+              <span>{{ project.shortName }}</span>
+              <em>{{ project.status }}</em>
             </button>
-            <button class="px-6 py-3 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2">
-              <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
-              </svg>
-              观看演示
+            <div v-if="store.favoriteProjects.length === 0" class="mini-empty">暂无收藏</div>
+          </div>
+          <div class="side-panel">
+            <div class="panel-title">最近访问</div>
+            <button v-for="project in store.recentProjects" :key="project.id" class="side-link" @click="openProject(project.id)">
+              <span>{{ project.shortName }}</span>
+              <em>{{ project.category }}</em>
             </button>
+            <div v-if="store.recentProjects.length === 0" class="mini-empty">暂无最近访问</div>
           </div>
+        </aside>
+      </div>
+    </div>
+  </section>
 
-          <div class="flex items-center gap-8 mt-10 pt-8 border-t border-gray-100">
-            <div v-for="stat in heroStats" :key="stat.label">
-              <div class="text-2xl font-bold text-gray-900">{{ stat.value }}</div>
-              <div class="text-xs text-gray-400 mt-0.5">{{ stat.label }}</div>
-            </div>
+  <div v-if="detailVisible" class="modal-mask" @click.self="closeDetail">
+    <section class="detail-modal">
+      <header class="detail-header">
+        <div class="detail-title">
+          <img :src="detail?.project.logo" :alt="detail?.project.name" />
+          <div>
+            <h2>{{ detail?.project.name }}</h2>
+            <p>{{ detail?.project.description }}</p>
           </div>
         </div>
+        <button class="close-btn" @click="closeDetail">×</button>
+      </header>
 
-        <!-- Right: Robot -->
-        <div class="flex justify-center lg:justify-end">
-          <div class="relative w-72 h-72 lg:w-80 lg:h-80">
-            <div class="absolute inset-0 rounded-full border-2 border-dashed border-blue-100 animate-spin" style="animation-duration: 20s;"></div>
-            <div class="absolute inset-6 rounded-full bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100/50"></div>
+      <nav class="detail-tabs">
+        <button v-for="tab in tabs" :key="tab.key" :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
+          {{ tab.label }}
+        </button>
+      </nav>
 
-            <!-- Robot -->
-            <div class="absolute inset-0 flex items-center justify-center">
-              <div class="flex flex-col items-center gap-2">
-                <!-- Head -->
-                <div class="w-24 h-20 bg-white rounded-2xl shadow-md border border-gray-100 flex flex-col items-center justify-center gap-2 relative">
-                  <div class="absolute -top-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                    <div class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow shadow-blue-300"></div>
-                    <div class="w-px h-3.5 bg-gray-200"></div>
-                  </div>
-                  <div class="flex gap-3">
-                    <div class="w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center">
-                      <div class="w-1 h-1 rounded-full bg-white"></div>
-                    </div>
-                    <div class="w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center">
-                      <div class="w-1 h-1 rounded-full bg-white"></div>
-                    </div>
-                  </div>
-                  <div class="w-8 h-1.5 rounded-full bg-gray-100 flex items-center justify-center gap-1">
-                    <div class="w-1 h-1 rounded-full bg-blue-300"></div>
-                    <div class="w-1 h-1 rounded-full bg-blue-400"></div>
-                    <div class="w-1 h-1 rounded-full bg-blue-300"></div>
-                  </div>
+      <div v-if="store.detailLoading" class="modal-state">加载中...</div>
+      <div v-else-if="detail" class="detail-body">
+        <div v-if="activeTab === 'basic'" class="detail-section">
+          <div class="status-block">
+            <span :class="['status-pill', statusClass(detail.project.status)]">{{ detail.project.status }}</span>
+            <strong>{{ detail.project.responseTime ? `${detail.project.responseTime}ms` : '未检测' }}</strong>
+            <span>{{ detail.project.lastCheckTime || '暂无检测时间' }}</span>
+          </div>
+          <dl class="info-list">
+            <div><dt>项目分类</dt><dd>{{ detail.project.category }}</dd></div>
+            <div><dt>项目标签</dt><dd>{{ detail.project.tags.join('、') }}</dd></div>
+            <div><dt>维护人</dt><dd>{{ detail.project.maintainer }}</dd></div>
+            <div><dt>异常原因</dt><dd>{{ detail.project.abnormalReason || '-' }}</dd></div>
+          </dl>
+        </div>
+
+        <div v-if="activeTab === 'entry'" class="detail-section entry-layout">
+          <section class="entry-group">
+            <div class="entry-heading">
+              <strong>访问地址</strong>
+              <span>Web、后台和其他可直接打开的入口</span>
+            </div>
+
+            <div v-if="detail.addresses.length === 0" class="modal-state">暂未配置访问地址</div>
+            <div v-else class="entry-addresses">
+              <div v-for="address in detail.addresses" :key="address.id" class="resource-row">
+                <div>
+                  <strong>{{ address.name }}</strong>
+                  <span>{{ address.type }} · {{ address.url }}</span>
                 </div>
-                <!-- Body -->
-                <div class="w-28 h-18 bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center p-3">
-                  <div class="grid grid-cols-3 gap-1">
-                    <div v-for="i in 9" :key="i" class="w-2 h-2 rounded-sm" :class="[i === 2 || i === 5 || i === 8 ? 'bg-blue-500' : i % 2 === 0 ? 'bg-blue-200' : 'bg-gray-100']"></div>
-                  </div>
+                <div class="resource-actions">
+                  <button @click="openAddress(address.url)">打开</button>
+                  <button @click="copyText(address.url, '地址已复制')">复制</button>
                 </div>
               </div>
             </div>
+          </section>
 
-            <!-- Floating cards -->
-            <div class="absolute top-4 -left-6 bg-white rounded-xl shadow-md border border-gray-100 px-3 py-2 flex items-center gap-2 whitespace-nowrap">
-              <div class="w-5 h-5 rounded-md bg-green-100 flex items-center justify-center shrink-0">
-                <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          <section class="entry-group">
+            <div class="entry-heading">
+              <strong>小程序入口</strong>
+            </div>
+
+            <div v-if="detail.qrcodes.length === 0" class="modal-state">暂未配置小程序二维码</div>
+            <div v-else class="qrcode-grid entry-qrcode-grid">
+              <div v-for="qrcode in detail.qrcodes" :key="qrcode.id" class="qrcode-card">
+                <img :src="qrcode.image" :alt="qrcode.name" />
+                <strong>{{ qrcode.name }}</strong>
+                <span>{{ qrcode.audience }}</span>
+                <p>{{ qrcode.description }}</p>
               </div>
-              <span class="text-xs font-medium text-gray-700">已处理 1,284 条</span>
             </div>
-            <div class="absolute bottom-8 -right-6 bg-white rounded-xl shadow-md border border-gray-100 px-3 py-2 flex items-center gap-2 whitespace-nowrap">
-              <div class="w-5 h-5 rounded-md bg-blue-100 flex items-center justify-center shrink-0">
-                <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              </div>
-              <span class="text-xs font-medium text-gray-700">响应 &lt; 0.3s</span>
-            </div>
-            <div class="absolute top-1/2 -translate-y-1/2 -right-10 bg-white rounded-xl shadow-md border border-gray-100 px-3 py-2 text-center">
-              <div class="text-xs text-gray-400">准确率</div>
-              <div class="text-base font-bold text-blue-600 leading-tight">98.6%</div>
-            </div>
-          </div>
+            <p v-if="detail.qrcodes.length > 0" class="entry-hint">扫码访问移动端或小程序资源</p>
+          </section>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Logos -->
-  <section class="py-10 border-y border-gray-100">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-      <p class="text-center text-gray-400 text-xs mb-6 tracking-widest uppercase">已为以下企业提供服务</p>
-      <div class="flex flex-wrap justify-center items-center gap-10">
-        <span v-for="brand in brands" :key="brand" class="text-gray-300 font-semibold text-base tracking-wide">{{ brand }}</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features -->
-  <section class="py-24 bg-white">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-      <div class="text-center mb-14">
-        <p class="text-blue-600 text-xs font-semibold mb-3 tracking-widest uppercase">核心能力</p>
-        <h2 class="text-3xl font-bold text-gray-900 mb-3">一个平台，覆盖所有 AI 场景</h2>
-        <p class="text-gray-400 text-sm max-w-xl mx-auto">无论是客服机器人、销售助手还是数据分析，AxureMart 都能快速搭建</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        <div
-          v-for="feature in features"
-          :key="feature.title"
-          class="p-6 rounded-2xl border border-gray-100 hover:border-blue-100 hover:shadow-lg hover:shadow-blue-50/50 transition-all duration-200"
-        >
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-4" :class="feature.iconBg">
-            <component :is="feature.icon" class="w-5 h-5" :class="feature.iconColor" />
-          </div>
-          <h3 class="text-sm font-semibold text-gray-900 mb-2">{{ feature.title }}</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">{{ feature.desc }}</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- How it works -->
-  <section class="py-24 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-      <div class="text-center mb-14">
-        <p class="text-blue-600 text-xs font-semibold mb-3 tracking-widest uppercase">使用流程</p>
-        <h2 class="text-3xl font-bold text-gray-900 mb-3">三步上线你的 AI 机器人</h2>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div v-for="(step, i) in steps" :key="step.title" class="text-center">
-          <div class="w-14 h-14 rounded-2xl bg-white border-2 border-blue-100 flex items-center justify-center text-xl font-bold text-blue-600 mx-auto mb-5 shadow-sm">
-            {{ i + 1 }}
-          </div>
-          <h3 class="text-sm font-semibold text-gray-900 mb-2">{{ step.title }}</h3>
-          <p class="text-gray-400 text-sm leading-relaxed">{{ step.desc }}</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats -->
-  <section class="py-16 bg-blue-600">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
-        <div v-for="stat in stats" :key="stat.label">
-          <div class="text-3xl font-bold mb-1">{{ stat.value }}</div>
-          <div class="text-blue-200 text-sm">{{ stat.label }}</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Testimonials -->
-  <section class="py-24 bg-white">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-      <div class="text-center mb-14">
-        <p class="text-blue-600 text-xs font-semibold mb-3 tracking-widest uppercase">用户评价</p>
-        <h2 class="text-3xl font-bold text-gray-900 mb-3">他们都在用 AxureMart</h2>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div v-for="review in reviews" :key="review.name" class="p-6 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
-          <div class="flex text-yellow-400 mb-4 gap-0.5">
-            <svg v-for="i in 5" :key="i" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-            </svg>
-          </div>
-          <p class="text-gray-600 text-sm leading-relaxed mb-5">"{{ review.content }}"</p>
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" :class="review.avatarColor">{{ review.name[0] }}</div>
+        <div v-if="activeTab === 'credential'" class="detail-section">
+          <div v-if="detail.credentials.length === 0" class="modal-state">暂无可查看账号凭据</div>
+          <div v-for="credential in detail.credentials" :key="credential.id" class="resource-row">
             <div>
-              <div class="text-gray-900 text-sm font-medium">{{ review.name }}</div>
-              <div class="text-gray-400 text-xs">{{ review.role }}</div>
+              <strong>{{ credential.name }} · {{ credential.environment }}</strong>
+              <span>账号：{{ credential.username }}</span>
+              <span>密码：{{ revealedIds.includes(credential.id) ? credential.password : '••••••••••••' }}</span>
+              <small>{{ credential.description }}</small>
+            </div>
+            <div class="resource-actions">
+              <button @click="revealPassword(credential.id)">查看</button>
+              <button @click="copyText(credential.username, '账号已复制')">复制账号</button>
+              <button @click="copyText(credential.password, '密码已复制')">复制密码</button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- CTA -->
-  <section class="py-24 bg-gray-50">
-    <div class="max-w-2xl mx-auto px-6 text-center">
-      <h2 class="text-3xl font-bold text-gray-900 mb-3">立即部署你的第一个 AI 机器人</h2>
-      <p class="text-gray-400 text-sm mb-8">免费试用 14 天，无需信用卡，5 分钟完成配置</p>
-      <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <button class="px-8 py-3 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
-          免费开始使用
-        </button>
-        <button class="px-8 py-3 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-white transition-colors">
-          联系销售团队
-        </button>
+        <div v-if="activeTab === 'instruction'" class="detail-section">
+          <dl class="info-list">
+            <div><dt>浏览器要求</dt><dd>{{ detail.instruction.browserRequirement }}</dd></div>
+            <div><dt>VPN 要求</dt><dd>{{ detail.instruction.vpnRequirement }}</dd></div>
+            <div><dt>注意事项</dt><dd>{{ detail.instruction.notes }}</dd></div>
+            <div><dt>维护联系人</dt><dd>{{ detail.instruction.maintainer }} · {{ detail.instruction.contactPhone }}</dd></div>
+          </dl>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { defineComponent, h } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { usePortalStore } from '@/stores/portal'
+import type { ProjectCategory, ProjectStatus } from '@/types/project'
 
-// SVG icon components
-const IconRobot = defineComponent({
-  render: () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5', d: 'M9 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2h-2M9 3a2 2 0 002 2h2a2 2 0 002-2M9 3a2 2 0 012-2h2a2 2 0 012 2' }),
-    h('circle', { cx: '9', cy: '12', r: '1', fill: 'currentColor', stroke: 'none' }),
-    h('circle', { cx: '15', cy: '12', r: '1', fill: 'currentColor', stroke: 'none' }),
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5', d: 'M9 16h6' }),
-  ]),
-})
-
-const IconBrain = defineComponent({
-  render: () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5', d: 'M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25' }),
-  ]),
-})
-
-const IconZap = defineComponent({
-  render: () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5', d: 'M13 10V3L4 14h7v7l9-11h-7z' }),
-  ]),
-})
-
-const IconChart = defineComponent({
-  render: () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5', d: 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z' }),
-  ]),
-})
-
-const IconPlug = defineComponent({
-  render: () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5', d: 'M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244' }),
-  ]),
-})
-
-const IconShield = defineComponent({
-  render: () => h('svg', { fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
-    h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5', d: 'M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z' }),
-  ]),
-})
-
-const heroStats = [
-  { value: '50K+', label: '活跃机器人' },
-  { value: '98.6%', label: '响应准确率' },
-  { value: '< 0.3s', label: '平均响应时间' },
+const store = usePortalStore()
+const favoriteOnly = ref(false)
+const detailVisible = ref(false)
+const activeTab = ref('basic')
+const revealedIds = ref<number[]>([])
+const toastMessage = ref('')
+let toastTimer: number | undefined
+const categoryOptions: ProjectCategory[] = ['内部系统', '客户项目', 'AI工具', '数据平台', '运维服务', '小程序']
+const statusOptions: ProjectStatus[] = ['可用', '异常', '维护中', '未检测']
+const tabs = [
+  { key: 'basic', label: '基本信息' },
+  { key: 'entry', label: '访问入口' },
+  { key: 'credential', label: '账号凭据' },
+  { key: 'instruction', label: '访问说明' },
 ]
 
-const brands = ['腾讯', '美团', '京东', '网易', '滴滴', '小米']
+const detail = computed(() => store.detail)
+const visibleProjects = computed(() =>
+  favoriteOnly.value ? store.projects.filter((project) => store.isFavorite(project.id)) : store.projects,
+)
 
-const features = [
-  { icon: IconRobot, iconBg: 'bg-blue-50', iconColor: 'text-blue-600', title: '智能对话机器人', desc: '基于大语言模型，理解上下文语义，提供自然流畅的多轮对话体验，支持中英文切换。' },
-  { icon: IconBrain, iconBg: 'bg-purple-50', iconColor: 'text-purple-600', title: '知识库训练', desc: '上传文档、网页或 FAQ，AI 自动学习并构建专属知识库，回答精准有据可查。' },
-  { icon: IconZap, iconBg: 'bg-yellow-50', iconColor: 'text-yellow-600', title: '自动化工作流', desc: '连接 CRM、工单系统、数据库，机器人自动执行任务，无需人工介入。' },
-  { icon: IconChart, iconBg: 'bg-green-50', iconColor: 'text-green-600', title: '数据分析助手', desc: '用自然语言查询数据，AI 自动生成图表和报告，让数据分析不再需要 SQL。' },
-  { icon: IconPlug, iconBg: 'bg-orange-50', iconColor: 'text-orange-600', title: '多渠道接入', desc: '一键接入网站、微信、钉钉、飞书等平台，统一管理所有渠道的对话。' },
-  { icon: IconShield, iconBg: 'bg-red-50', iconColor: 'text-red-600', title: '安全与合规', desc: '数据本地化部署可选，内容安全过滤，满足金融、医疗等行业合规要求。' },
-]
+function statusClass(status: ProjectStatus) {
+  return {
+    available: status === '可用',
+    error: status === '异常',
+    maintenance: status === '维护中',
+    unchecked: status === '未检测',
+  }
+}
 
-const steps = [
-  { title: '配置你的机器人', desc: '选择场景模板，上传知识库，设置对话风格，10 分钟完成初始配置。' },
-  { title: '训练与测试', desc: '在沙盒环境中测试对话效果，持续优化回答质量，直到满意为止。' },
-  { title: '一键部署上线', desc: '生成嵌入代码或 API，接入任意平台，实时监控运行状态。' },
-]
+async function loadProjects() {
+  await store.loadProjects()
+}
 
-const stats = [
-  { value: '50,000+', label: '部署机器人数' },
-  { value: '2亿+', label: '处理对话数' },
-  { value: '98.6%', label: '用户满意度' },
-  { value: '< 0.3s', label: '平均响应时间' },
-]
+function resetFilters() {
+  store.filters = { keyword: '', category: '', status: '' }
+  favoriteOnly.value = false
+  loadProjects()
+}
 
-const reviews = [
-  { name: '陈总', role: '电商平台 · 客服负责人', avatarColor: 'bg-blue-500', content: '接入 AxureMart 后，客服机器人处理了 80% 的常见问题，人工客服工作量减少了一半，客户满意度反而提升了。' },
-  { name: '刘工', role: '金融科技公司 · 技术总监', avatarColor: 'bg-indigo-500', content: '知识库训练非常方便，把我们的产品手册上传进去，机器人就能准确回答各种专业问题，比自己训练省了大量时间。' },
-  { name: '王总', role: 'SaaS 创业公司 · CEO', avatarColor: 'bg-cyan-500', content: '5 分钟就部署好了，接入飞书后销售团队的询盘响应速度从几小时缩短到秒级，转化率明显提升。' },
-]
+async function openProject(projectId: number) {
+  revealedIds.value = []
+  activeTab.value = 'basic'
+  detailVisible.value = true
+  await store.openDetail(projectId)
+}
+
+function closeDetail() {
+  detailVisible.value = false
+}
+
+function openAddress(url: string) {
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
+
+async function copyText(text: string, message: string) {
+  await navigator.clipboard?.writeText(text)
+  showToast(message)
+}
+
+function showToast(message: string) {
+  toastMessage.value = message
+  if (toastTimer) {
+    window.clearTimeout(toastTimer)
+  }
+  toastTimer = window.setTimeout(() => {
+    toastMessage.value = ''
+  }, 1800)
+}
+
+function revealPassword(id: number) {
+  if (!revealedIds.value.includes(id)) revealedIds.value.push(id)
+}
+
+onMounted(loadProjects)
 </script>
+
+<style scoped>
+.portal-shell {
+  min-height: 100vh;
+  background: #f7f9fc;
+  padding: 88px 24px 40px;
+  position: relative;
+}
+
+.portal-toast {
+  position: fixed;
+  top: 78px;
+  left: 50%;
+  z-index: 60;
+  transform: translateX(-50%);
+  border: 1px solid rgba(17, 24, 39, 0.1);
+  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.94);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  padding: 10px 14px;
+  box-shadow: 0 14px 28px rgba(17, 24, 39, 0.16);
+}
+
+.portal-main {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.portal-toolbar,
+.filter-row,
+.project-card,
+.side-panel,
+.detail-modal {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.portal-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+}
+
+.eyebrow {
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+.portal-toolbar h1 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.toolbar-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.toolbar-stats div {
+  min-width: 96px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f3f6fb;
+}
+
+.toolbar-stats strong {
+  display: block;
+  color: #111827;
+  font-size: 24px;
+}
+
+.toolbar-stats span,
+.card-meta,
+.project-desc,
+.side-link em,
+.sub-text {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  margin-top: 16px;
+}
+
+.filter-input,
+.filter-select {
+  height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: #111827;
+  background: #fff;
+}
+
+.filter-input {
+  min-width: 300px;
+  flex: 1;
+}
+
+.favorite-toggle {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  color: #374151;
+  font-size: 14px;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+}
+
+.primary-btn,
+.ghost-btn,
+.detail-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.primary-btn,
+.detail-btn {
+  background: #2563eb;
+  color: #fff;
+}
+
+.ghost-btn {
+  background: #edf2f7;
+  color: #374151;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.project-card {
+  padding: 18px;
+}
+
+.card-head,
+.card-title-line,
+.card-meta,
+.resource-row,
+.detail-header,
+.detail-title {
+  display: flex;
+  align-items: center;
+}
+
+.card-head,
+.card-title-line,
+.card-meta,
+.resource-row,
+.detail-header {
+  justify-content: space-between;
+}
+
+.project-logo,
+.detail-title img {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+}
+
+.icon-btn,
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #2563eb;
+  font-size: 18px;
+}
+
+.card-title-line {
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.card-title-line h2 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.project-desc {
+  line-height: 1.7;
+  margin-top: 10px;
+  min-height: 46px;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.category-chip,
+.tag-chip,
+.status-pill {
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 12px;
+}
+
+.category-chip {
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.tag-chip {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.status-pill.available {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-pill.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-pill.maintenance {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-pill.unchecked {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.detail-btn {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.side-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.side-panel {
+  padding: 16px;
+}
+
+.panel-title {
+  color: #111827;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.side-link {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  background: transparent;
+  color: #111827;
+  border-bottom: 1px solid #f3f4f6;
+  text-align: left;
+}
+
+.mini-empty,
+.state-box,
+.modal-state {
+  color: #6b7280;
+  padding: 18px;
+  text-align: center;
+}
+
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 56px 20px 24px;
+}
+
+.detail-modal {
+  width: min(1120px, calc(100vw - 48px));
+  height: min(680px, calc(100vh - 80px));
+  max-height: calc(100vh - 80px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-title {
+  gap: 14px;
+}
+
+.detail-title h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.detail-title p {
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.detail-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-tabs button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #4b5563;
+  background: #f3f4f6;
+}
+
+.detail-tabs button.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.detail-body {
+  overflow: auto;
+  padding: 22px 24px;
+}
+
+.status-block {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.info-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.info-list div,
+.resource-row,
+.qrcode-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.entry-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.entry-group {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.entry-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.entry-heading strong {
+  color: #111827;
+  font-size: 15px;
+}
+
+.entry-heading span {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.entry-addresses {
+  display: grid;
+  gap: 12px;
+}
+
+.info-list dt {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.info-list dd {
+  margin: 6px 0 0;
+  color: #111827;
+  line-height: 1.6;
+}
+
+.resource-row {
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.resource-row div:first-child {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.resource-row span,
+.resource-row small {
+  color: #6b7280;
+  overflow-wrap: anywhere;
+}
+
+.entry-addresses .resource-row {
+  margin-bottom: 0;
+}
+
+.resource-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.resource-actions button {
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: #edf2f7;
+  color: #1f2937;
+}
+
+.qrcode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.qrcode-card {
+  display: grid;
+  gap: 8px;
+}
+
+.qrcode-card img {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+}
+
+.qrcode-card p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.entry-qrcode-grid {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.entry-hint {
+  width: 214px;
+  min-height: 24px;
+  margin: -10px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 920px) {
+  .portal-toolbar,
+  .content-grid {
+    display: block;
+  }
+
+  .toolbar-stats {
+    margin-top: 18px;
+  }
+
+  .side-zone {
+    margin-top: 16px;
+  }
+
+  .info-list {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-mask {
+    padding: 48px 12px 18px;
+  }
+
+  .detail-modal {
+    width: min(100%, calc(100vw - 24px));
+    height: min(720px, calc(100vh - 66px));
+    max-height: calc(100vh - 66px);
+  }
+
+  .entry-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .entry-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .entry-heading span {
+    text-align: left;
+  }
+}
+</style>

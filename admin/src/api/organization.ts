@@ -16,6 +16,7 @@ import {
   deleteUserMock,
   batchDeleteUsersMock,
   updateUserStatusMock,
+  resetUserPasswordMock,
   batchSetPositionMock,
   batchSetRoleMock,
   getRoleListMock,
@@ -353,6 +354,37 @@ export function updateUserStatus(id: number, status: number) {
   return request.put({
     url: `/admin/organization/user/${id}/status`,
     data: { status }
+  })
+}
+
+/**
+ * 重置用户密码
+ */
+export function resetUserPassword(id: number, password: string) {
+  if (USE_MOCK) {
+    return new Promise<any>((resolve, reject) => {
+      setTimeout(() => {
+        try {
+          const success = resetUserPasswordMock(id, password)
+          if (success) {
+            resolve({
+              code: 200,
+              data: null,
+              message: '重置密码成功'
+            })
+          } else {
+            reject(new Error('用户不存在'))
+          }
+        } catch (error: any) {
+          reject(new Error(error.message || '重置密码失败'))
+        }
+      }, 300)
+    })
+  }
+
+  return request.put({
+    url: `/admin/organization/user/${id}/reset-password`,
+    data: { password }
   })
 }
 

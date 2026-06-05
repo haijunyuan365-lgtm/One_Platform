@@ -102,8 +102,8 @@
         </ElFormItem>
         <ElFormItem label="部门类型" prop="type">
           <ElSelect v-model="form.type" placeholder="请选择部门类型" style="width: 100%">
-            <ElOption label="省公司" value="省公司" />
-            <ElOption label="分公司" value="分公司" />
+            <ElOption label="公司" value="公司" />
+            <ElOption label="中心" value="中心" />
             <ElOption label="部门" value="部门" />
           </ElSelect>
         </ElFormItem>
@@ -137,8 +137,8 @@
     string,
     { tagType: 'primary' | 'success' | 'info' | 'warning' | 'danger' }
   > = {
-    省公司: { tagType: 'danger' },
-    分公司: { tagType: 'warning' },
+    公司: { tagType: 'danger' },
+    中心: { tagType: 'warning' },
     部门: { tagType: 'primary' }
   }
 

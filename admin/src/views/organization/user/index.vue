@@ -96,9 +96,10 @@
                   />
                 </template>
               </ElTableColumn>
-              <ElTableColumn label="操作" width="150" align="center" fixed="right">
+              <ElTableColumn label="操作" width="220" align="center" fixed="right">
                 <template #default="{ row }">
                   <ElButton link type="primary" @click="handleEdit(row)">编辑</ElButton>
+                  <ElButton link type="warning" @click="handleResetPassword(row)">重置密码</ElButton>
                   <ElButton link type="danger" @click="handleDelete(row)">删除</ElButton>
                 </template>
               </ElTableColumn>
@@ -158,6 +159,32 @@
       <template #footer>
         <ElButton @click="dialogVisible = false">取消</ElButton>
         <ElButton type="primary" :loading="submitLoading" @click="handleSubmit">确定</ElButton>
+      </template>
+    </ElDialog>
+
+    <!-- 重置密码对话框 -->
+    <ElDialog
+      v-model="resetPasswordDialogVisible"
+      title="重置密码"
+      width="420px"
+      @closed="resetPasswordFormRef?.resetFields()"
+    >
+      <ElForm ref="resetPasswordFormRef" :model="resetPasswordForm" :rules="resetPasswordRules" label-width="100px">
+        <ElFormItem label="用户">
+          <ElInput v-model="resetPasswordForm.userName" disabled />
+        </ElFormItem>
+        <ElFormItem label="新密码" prop="password">
+          <ElInput
+            v-model="resetPasswordForm.password"
+            type="password"
+            show-password
+            placeholder="请输入8-30位字母和数字组合"
+          />
+        </ElFormItem>
+      </ElForm>
+      <template #footer>
+        <ElButton @click="resetPasswordDialogVisible = false">取消</ElButton>
+        <ElButton type="primary" :loading="resetPasswordLoading" @click="handleConfirmResetPassword">确定</ElButton>
       </template>
     </ElDialog>
 
@@ -251,6 +278,25 @@
 
   const roleDialogVisible = ref(false)
   const roleForm = reactive({ roleIds: [] as number[] })
+
+  const resetPasswordDialogVisible = ref(false)
+  const resetPasswordLoading = ref(false)
+  const resetPasswordFormRef = ref<FormInstance>()
+  const resetPasswordForm = reactive({
+    userId: 0,
+    userName: '',
+    password: ''
+  })
+  const resetPasswordRules: FormRules = {
+    password: [
+      { required: true, message: '请输入新密码', trigger: 'blur' },
+      {
+        pattern: /^(?=.*[A-Za-z])(?=.*\d).{8,30}$/,
+        message: '密码需包含字母和数字，长度不少于8位',
+        trigger: 'blur'
+      }
+    ]
+  }
 
   // 部门树加载
   async function loadDepartmentList() {
@@ -349,6 +395,27 @@
     } catch (error: any) {
       ElMessage.error(error.message || '状态更新失败')
       row.status = row.status === 1 ? 0 : 1
+    }
+  }
+
+  function handleResetPassword(row: AdminUser) {
+    resetPasswordForm.userId = row.id
+    resetPasswordForm.userName = row.realName || row.username
+    resetPasswordForm.password = ''
+    resetPasswordDialogVisible.value = true
+  }
+
+  async function handleConfirmResetPassword() {
+    try {
+      await resetPasswordFormRef.value?.validate()
+      resetPasswordLoading.value = true
+      await userApi.resetPassword(resetPasswordForm.userId, resetPasswordForm.password)
+      ElMessage.success('重置密码成功')
+      resetPasswordDialogVisible.value = false
+    } catch (error: any) {
+      if (error !== false) ElMessage.error(error.message || '重置密码失败')
+    } finally {
+      resetPasswordLoading.value = false
     }
   }
 

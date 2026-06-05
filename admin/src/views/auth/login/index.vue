@@ -9,7 +9,7 @@
           </el-icon>
         </div>
         <h2 class="brand-name">{{ systemName }}</h2>
-        <p class="brand-desc">安全监督风险智能分析平台</p>
+        <p class="brand-desc">项目入口与访问资料统一管理后台</p>
         <div class="brand-circles">
           <div class="circle circle-1"></div>
           <div class="circle circle-2"></div>
@@ -62,7 +62,7 @@
       </div>
     </div>
 
-    <p class="copyright">© 2026 一次物流信息管理模块 All Rights Reserved</p>
+    <p class="copyright">© 2026 公司一体化平台 All Rights Reserved</p>
   </div>
 </template>
 

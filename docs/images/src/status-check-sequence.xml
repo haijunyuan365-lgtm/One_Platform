@@ -1,0 +1,10 @@
+<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/>
+  <mxCell id="2" value="定时任务" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="60" y="40" width="120" height="40" as="geometry"/></mxCell>
+  <mxCell id="3" value="检测服务" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;" vertex="1" parent="1"><mxGeometry x="260" y="40" width="120" height="40" as="geometry"/></mxCell>
+  <mxCell id="4" value="目标系统" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1"><mxGeometry x="460" y="40" width="120" height="40" as="geometry"/></mxCell>
+  <mxCell id="5" value="数据库" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;size=10;" vertex="1" parent="1"><mxGeometry x="660" y="35" width="120" height="50" as="geometry"/></mxCell>
+  <mxCell id="6" value="触发检测" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="2" target="3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="7" value="访问检测地址" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="3" target="4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="8" value="返回状态或异常" style="edgeStyle=orthogonalEdgeStyle;rounded=0;dashed=1;" edge="1" source="4" target="3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="9" value="保存检测记录" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="3" target="5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+</root></mxGraphModel>

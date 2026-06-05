@@ -1,0 +1,11 @@
+<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/>
+  <mxCell id="2" value="管理员进入项目管理" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1"><mxGeometry x="60" y="80" width="160" height="50" as="geometry"/></mxCell>
+  <mxCell id="3" value="维护卡片基础信息" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="280" y="80" width="170" height="50" as="geometry"/></mxCell>
+  <mxCell id="4" value="维护地址、凭据、二维码" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="510" y="80" width="190" height="50" as="geometry"/></mxCell>
+  <mxCell id="5" value="配置可见与敏感权限" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;" vertex="1" parent="1"><mxGeometry x="760" y="80" width="180" height="50" as="geometry"/></mxCell>
+  <mxCell id="6" value="发布到门户" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1"><mxGeometry x="1000" y="80" width="150" height="50" as="geometry"/></mxCell>
+  <mxCell id="7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="2" target="3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="3" target="4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="4" target="5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="5" target="6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+</root></mxGraphModel>

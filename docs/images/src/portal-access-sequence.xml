@@ -1,0 +1,10 @@
+<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/>
+  <mxCell id="2" value="用户" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="60" y="40" width="120" height="40" as="geometry"/></mxCell>
+  <mxCell id="3" value="前台门户" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1"><mxGeometry x="260" y="40" width="120" height="40" as="geometry"/></mxCell>
+  <mxCell id="4" value="项目入口服务" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;" vertex="1" parent="1"><mxGeometry x="460" y="40" width="140" height="40" as="geometry"/></mxCell>
+  <mxCell id="5" value="数据库" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;size=10;" vertex="1" parent="1"><mxGeometry x="700" y="35" width="120" height="50" as="geometry"/></mxCell>
+  <mxCell id="6" value="请求项目列表" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="2" target="3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="7" value="按权限查询" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="3" target="4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="8" value="读取项目和状态" style="edgeStyle=orthogonalEdgeStyle;rounded=0;" edge="1" source="4" target="5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+  <mxCell id="9" value="返回授权卡片" style="edgeStyle=orthogonalEdgeStyle;rounded=0;dashed=1;" edge="1" source="5" target="3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+</root></mxGraphModel>

@@ -2,7 +2,6 @@
  * 快速入口配置
  * 包含：应用列表、快速链接等配置
  */
-import { WEB_LINKS } from '@/utils/constants'
 import type { FastEnterConfig } from '@/types/config'
 
 const fastEnterConfig: FastEnterConfig = {
@@ -11,76 +10,49 @@ const fastEnterConfig: FastEnterConfig = {
   // 应用列表
   applications: [
     {
-      name: '工作台',
-      description: '系统概览与数据统计',
+      name: '项目卡片',
+      description: '维护项目基础信息与展示状态',
       icon: '&#xe721;',
       iconColor: '#377dff',
       enabled: true,
       order: 1,
-      routeName: 'Console'
+      routeName: 'ProjectCard'
     },
     {
-      name: '分析页',
-      description: '数据分析与可视化',
+      name: '详情内容',
+      description: '维护访问地址、说明和联系人',
       icon: '&#xe812;',
       iconColor: '#ff3b30',
       enabled: true,
       order: 2,
-      routeName: 'Analysis'
+      routeName: 'ProjectDetailContent'
     },
     {
-      name: '礼花效果',
-      description: '动画特效展示',
+      name: '账号凭据',
+      description: '维护项目账号和凭据资料',
       icon: '&#xe7ed;',
       iconColor: '#7A7FFF',
       enabled: true,
       order: 3,
-      routeName: 'Fireworks'
+      routeName: 'ProjectCredential'
     },
     {
-      name: '聊天',
-      description: '即时通讯功能',
+      name: '状态检测',
+      description: '配置项目可用性检测规则',
       icon: '&#xe70a;',
       iconColor: '#13DEB9',
       enabled: true,
       order: 4,
-      routeName: 'Chat'
+      routeName: 'StatusConfig'
     },
     {
-      name: '官方文档',
-      description: '使用指南与开发文档',
+      name: '操作日志',
+      description: '查询敏感操作与后台维护日志',
       icon: '&#xe788;',
       iconColor: '#ffb100',
       enabled: true,
       order: 5,
-      link: WEB_LINKS.DOCS
-    },
-    {
-      name: '技术支持',
-      description: '技术支持与问题反馈',
-      icon: '&#xe86e;',
-      iconColor: '#ff6b6b',
-      enabled: true,
-      order: 6,
-      link: WEB_LINKS.COMMUNITY
-    },
-    {
-      name: '更新日志',
-      description: '版本更新与变更记录',
-      icon: '&#xe81c;',
-      iconColor: '#38C0FC',
-      enabled: true,
-      order: 7,
-      routeName: 'ChangeLog'
-    },
-    {
-      name: '哔哩哔哩',
-      description: '技术分享与交流',
-      icon: '&#xe6b4;',
-      iconColor: '#FB7299',
-      enabled: true,
-      order: 8,
-      link: WEB_LINKS.BILIBILI
+      routeName: 'OperationLog'
     }
   ],
   // 快速链接
@@ -92,22 +64,10 @@ const fastEnterConfig: FastEnterConfig = {
       routeName: 'Login'
     },
     {
-      name: '注册',
-      enabled: true,
-      order: 2,
-      routeName: 'Register'
-    },
-    {
       name: '忘记密码',
       enabled: true,
-      order: 3,
+      order: 2,
       routeName: 'ForgetPassword'
-    },
-    {
-      name: '定价',
-      enabled: true,
-      order: 4,
-      routeName: 'Pricing'
     }
   ]
 }

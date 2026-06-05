@@ -8,8 +8,8 @@
         <!-- Logo + Nav -->
         <div class="flex items-center">
           <RouterLink to="/" class="flex items-center gap-2 no-underline shrink-0 mr-8">
-            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-sm font-bold">A</div>
-            <span class="font-bold text-base text-gray-900">AxureMart</span>
+            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-sm font-bold">一</div>
+            <span class="font-bold text-base text-gray-900">公司一体化平台</span>
           </RouterLink>
 
           <!-- Desktop Nav -->
@@ -72,7 +72,7 @@
           <template v-else>
             <button class="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors" @click="loginModalOpen = true">登录</button>
             <button class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
-              免费试用
+              管理后台
             </button>
           </template>
         </div>
@@ -102,7 +102,7 @@
       </RouterLink>
       <div class="border-t border-gray-100 mt-2 pt-3 flex flex-col gap-2">
         <button v-if="!authStore.isLoggedIn" class="w-full py-2.5 rounded-lg border border-gray-200 text-gray-700 text-sm font-medium" @click="loginModalOpen = true; menuOpen = false">登录</button>
-        <button v-if="!authStore.isLoggedIn" class="w-full py-2.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">免费试用</button>
+        <button v-if="!authStore.isLoggedIn" class="w-full py-2.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">管理后台</button>
         <button v-if="authStore.isLoggedIn" class="w-full py-2.5 rounded-lg border border-red-100 text-red-500 text-sm font-medium" @click="handleLogout">退出登录</button>
       </div>
     </div>
@@ -145,11 +145,7 @@ onMounted(() => document.addEventListener('click', onClickOutside))
 onUnmounted(() => document.removeEventListener('click', onClickOutside))
 
 const navItems = [
-  { label: '首页', path: '/' },
-  { label: '产品', path: '/product' },
-  { label: '定价', path: '/pricing' },
-  { label: '关于我们', path: '/about' },
-  { label: '联系我们', path: '/contact' },
+  { label: '项目门户', path: '/' },
 ]
 </script>
 

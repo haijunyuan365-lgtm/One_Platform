@@ -13,6 +13,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppHeader: typeof import('./components/layout/AppHeader.vue')['default']
     DefaultLayout: typeof import('./components/layout/DefaultLayout.vue')['default']
+    ElIcon: typeof import('element-plus/es')['ElIcon']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     LoginModal: typeof import('./components/common/LoginModal.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

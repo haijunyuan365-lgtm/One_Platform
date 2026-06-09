@@ -29,7 +29,7 @@ export interface ProjectCredential {
   id: number
   name: string
   username: string
-  password: string
+  passwordMasked: string
   environment: CredentialEnv
   description: string
 }

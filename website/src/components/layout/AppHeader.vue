@@ -1,109 +1,74 @@
 <template>
-  <header
-    class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-    :class="scrolled ? 'bg-white/60 backdrop-blur-2xl' : 'bg-transparent'"
-  >
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <!-- Logo + Nav -->
-        <div class="flex items-center">
-          <RouterLink to="/" class="flex items-center gap-2 no-underline shrink-0 mr-8">
-            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-sm font-bold">一</div>
-            <span class="font-bold text-base text-gray-900">公司一体化平台</span>
-          </RouterLink>
+  <header class="app-header" :class="{ scrolled }">
+    <div class="header-inner">
+      <RouterLink to="/" class="brand-link">
+        <span class="brand-mark">
+          <ElIcon><Monitor /></ElIcon>
+        </span>
+        <span class="brand-copy">
+          <strong>公司一体化平台</strong>
+          <small>Project Portal</small>
+        </span>
+      </RouterLink>
 
-          <!-- Desktop Nav -->
-          <nav class="hidden md:flex items-center">
-          <RouterLink
-            v-for="item in navItems"
-            :key="item.path"
-            :to="item.path"
-            class="relative px-3.5 py-5 text-sm text-gray-500 hover:text-gray-900 transition-colors no-underline whitespace-nowrap"
-            active-class="text-blue-600 font-medium nav-active"
-            exact-active-class="text-blue-600 font-medium nav-active"
-          >
-            {{ item.label }}
-          </RouterLink>
-          </nav>
-        </div>
+      <div class="header-spacer"></div>
 
-        <!-- CTA -->
-        <div class="hidden md:flex items-center gap-2 shrink-0">
-          <!-- Logged in: user avatar + dropdown -->
-          <template v-if="authStore.isLoggedIn">
-            <div class="relative" ref="userMenuRef">
-              <button
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
-                @click="userMenuOpen = !userMenuOpen"
-              >
-                <div class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
-                  {{ authStore.user?.name?.[0] }}
+      <div class="platform-state">
+        <span></span>
+        内部门户
+      </div>
+
+      <div class="header-actions">
+        <template v-if="authStore.isLoggedIn">
+          <div ref="userMenuRef" class="user-menu">
+            <button type="button" class="user-trigger" @click.stop="userMenuOpen = !userMenuOpen">
+              <span class="avatar">
+                <img v-if="authStore.user?.avatar" :src="authStore.user.avatar" :alt="authStore.user.name" />
+                <span v-else>{{ userInitial }}</span>
+              </span>
+              <span class="user-meta">
+                <strong>{{ authStore.user?.name }}</strong>
+                <small>{{ authStore.user?.role || 'portal user' }}</small>
+              </span>
+              <ElIcon class="arrow-icon" :class="{ open: userMenuOpen }"><ArrowDown /></ElIcon>
+            </button>
+
+            <Transition name="menu-pop">
+              <div v-if="userMenuOpen" class="user-dropdown">
+                <div class="dropdown-profile">
+                  <span class="avatar avatar-large">
+                    <img v-if="authStore.user?.avatar" :src="authStore.user.avatar" :alt="authStore.user.name" />
+                    <span v-else>{{ userInitial }}</span>
+                  </span>
+                  <div>
+                    <strong>{{ authStore.user?.name }}</strong>
+                    <small>{{ authStore.user?.email }}</small>
+                  </div>
                 </div>
-                <span class="text-sm text-gray-700 font-medium">{{ authStore.user?.name }}</span>
-                <svg class="w-3.5 h-3.5 text-gray-400 transition-transform" :class="userMenuOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-              </button>
-              <!-- Dropdown -->
-              <div v-if="userMenuOpen" class="absolute right-0 top-full mt-1.5 w-44 bg-white rounded-xl border border-gray-100 shadow-lg py-1 z-50">
-                <div class="px-3 py-2 border-b border-gray-50">
-                  <div class="text-xs font-medium text-gray-900 truncate">{{ authStore.user?.name }}</div>
-                  <div class="text-xs text-gray-400 truncate">{{ authStore.user?.email }}</div>
-                </div>
-                <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors text-left">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                <button type="button" class="dropdown-item">
+                  <ElIcon><User /></ElIcon>
                   个人中心
                 </button>
-                <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors text-left">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <button type="button" class="dropdown-item">
+                  <ElIcon><Setting /></ElIcon>
                   账号设置
                 </button>
-                <div class="border-t border-gray-50 mt-1 pt-1">
-                  <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors text-left" @click="handleLogout">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
-                    退出登录
-                  </button>
-                </div>
+                <button type="button" class="dropdown-item danger" @click="handleLogout">
+                  <ElIcon><SwitchButton /></ElIcon>
+                  退出登录
+                </button>
               </div>
-            </div>
-          </template>
+            </Transition>
+          </div>
+        </template>
 
-          <!-- Not logged in -->
-          <template v-else>
-            <button class="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors" @click="loginModalOpen = true">登录</button>
-            <button class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
-              管理后台
-            </button>
-          </template>
-        </div>
-
-        <!-- Mobile menu button -->
-        <button class="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-50 transition-all" @click="menuOpen = !menuOpen">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path v-if="!menuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Mobile Nav -->
-    <div v-if="menuOpen" class="md:hidden border-t border-gray-100 bg-white px-6 py-4 flex flex-col gap-1">
-      <RouterLink
-        v-for="item in navItems"
-        :key="item.path"
-        :to="item.path"
-        class="px-4 py-2.5 rounded-lg text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all no-underline"
-        exact-active-class="text-blue-600 font-medium bg-blue-50"
-        active-class="text-blue-600 font-medium bg-blue-50"
-        @click="menuOpen = false"
-      >
-        {{ item.label }}
-      </RouterLink>
-      <div class="border-t border-gray-100 mt-2 pt-3 flex flex-col gap-2">
-        <button v-if="!authStore.isLoggedIn" class="w-full py-2.5 rounded-lg border border-gray-200 text-gray-700 text-sm font-medium" @click="loginModalOpen = true; menuOpen = false">登录</button>
-        <button v-if="!authStore.isLoggedIn" class="w-full py-2.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">管理后台</button>
-        <button v-if="authStore.isLoggedIn" class="w-full py-2.5 rounded-lg border border-red-100 text-red-500 text-sm font-medium" @click="handleLogout">退出登录</button>
+        <template v-else>
+          <button type="button" class="text-btn" @click="loginModalOpen = true">登录</button>
+          <button type="button" class="admin-btn" @click="openAdmin()">
+            <ElIcon><Connection /></ElIcon>
+            管理后台
+          </button>
+        </template>
       </div>
     </div>
   </header>
@@ -112,28 +77,43 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, watch, onMounted, onUnmounted } from 'vue'
+import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { Ref } from 'vue'
+import {
+  ArrowDown,
+  Connection,
+  Monitor,
+  Setting,
+  SwitchButton,
+  User,
+} from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import LoginModal from '@/components/common/LoginModal.vue'
 
 const authStore = useAuthStore()
-const menuOpen = ref(false)
 const scrolled = ref(false)
 const loginModalOpen = ref(false)
 const userMenuOpen = ref(false)
 const userMenuRef = ref<HTMLElement>()
+const adminUrl = import.meta.env.VITE_ADMIN_URL || '/admin'
 
-// 从 App.vue 注入的滚动位置
+const userInitial = computed(() => authStore.user?.name?.slice(0, 1) || '用')
+
 const scrollY = inject<Ref<number>>('scrollY')
 if (scrollY) {
-  watch(scrollY, (val) => { scrolled.value = val > 20 })
+  watch(scrollY, (val) => {
+    scrolled.value = val > 20
+  })
 }
 
 function onClickOutside(e: MouseEvent) {
   if (userMenuRef.value && !userMenuRef.value.contains(e.target as Node)) {
     userMenuOpen.value = false
   }
+}
+
+function openAdmin() {
+  window.open(adminUrl, '_blank', 'noopener,noreferrer')
 }
 
 async function handleLogout() {
@@ -143,21 +123,334 @@ async function handleLogout() {
 
 onMounted(() => document.addEventListener('click', onClickOutside))
 onUnmounted(() => document.removeEventListener('click', onClickOutside))
-
-const navItems = [
-  { label: '项目门户', path: '/' },
-]
 </script>
 
 <style scoped>
-.nav-active::after {
-  content: '';
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  border-bottom: 1px solid transparent;
+  background: rgba(244, 247, 250, 0.76);
+  backdrop-filter: blur(18px);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.app-header.scrolled {
+  border-color: rgba(203, 213, 225, 0.86);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+}
+
+.header-inner {
+  width: min(1320px, 100%);
+  height: 70px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.brand-link,
+.user-trigger,
+.admin-btn,
+.text-btn,
+.dropdown-item {
+  text-decoration: none;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 224px;
+  color: #142033;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(18, 66, 118, 0.16);
+  border-radius: 8px;
+  color: #fff;
+  background:
+    linear-gradient(145deg, #133858, #1e63d6 62%, #2bb18a),
+    #1e63d6;
+  box-shadow: 0 12px 24px rgba(30, 99, 214, 0.2);
+}
+
+.brand-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.brand-copy strong {
+  color: #142033;
+  font-size: 15px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.brand-copy small,
+.user-meta small,
+.dropdown-profile small {
+  color: #718096;
+  font-size: 12px;
+}
+
+.header-spacer {
+  flex: 1;
+  min-width: 16px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.platform-state {
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid rgba(43, 177, 138, 0.22);
+  border-radius: 8px;
+  color: #0b7a55;
+  background: rgba(228, 248, 239, 0.72);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.platform-state span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #2bb18a;
+  box-shadow: 0 0 0 4px rgba(43, 177, 138, 0.16);
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.text-btn,
+.admin-btn,
+.user-trigger {
+  height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.text-btn {
+  padding: 0 14px;
+  color: #526078;
+  background: transparent;
+}
+
+.text-btn:hover {
+  color: #142033;
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #fff;
+  background: #1e63d6;
+  box-shadow: 0 12px 24px rgba(30, 99, 214, 0.2);
+}
+
+.admin-btn {
+  padding: 0 15px;
+}
+
+.admin-btn:hover {
+  background: #174fba;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 10px 0 6px;
+  color: #142033;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(203, 213, 225, 0.78);
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  color: #fff;
+  background: #17324d;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-large {
+  width: 40px;
+  height: 40px;
+}
+
+.user-meta {
+  display: grid;
+  gap: 1px;
+  text-align: left;
+}
+
+.user-meta strong {
+  max-width: 96px;
+  overflow: hidden;
+  color: #142033;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arrow-icon {
+  color: #718096;
+  transition: transform 0.18s ease;
+}
+
+.arrow-icon.open {
+  transform: rotate(180deg);
+}
+
+.user-dropdown {
   position: absolute;
-  bottom: 0;
-  left: 14px;
-  right: 14px;
-  height: 2px;
-  background-color: #2563eb;
-  border-radius: 1px;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 240px;
+  padding: 8px;
+  border: 1px solid #dfe7ef;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.16);
+}
+
+.dropdown-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdown-profile {
+  padding: 10px;
+  border-bottom: 1px solid #edf1f5;
+  margin-bottom: 6px;
+}
+
+.dropdown-profile strong {
+  display: block;
+  max-width: 152px;
+  overflow: hidden;
+  color: #142033;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-item {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 10px;
+  border-radius: 8px;
+  color: #526078;
+  background: transparent;
+  font-size: 14px;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  color: #142033;
+  background: #f3f6f8;
+}
+
+.dropdown-item.danger {
+  color: #b42318;
+}
+
+.dropdown-item.danger:hover {
+  background: #fff1ed;
+}
+
+.menu-pop-enter-active,
+.menu-pop-leave-active {
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.menu-pop-enter-from,
+.menu-pop-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+@media (max-width: 840px) {
+  .header-inner {
+    height: 64px;
+    padding: 0 14px;
+  }
+
+  .brand-link {
+    min-width: 0;
+  }
+
+  .brand-copy small {
+    display: none;
+  }
+
+  .platform-state {
+    display: none;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .text-btn {
+    padding: 0 8px;
+  }
+
+  .admin-btn {
+    padding: 0 10px;
+  }
+
+  .user-meta {
+    display: none;
+  }
 }
 </style>

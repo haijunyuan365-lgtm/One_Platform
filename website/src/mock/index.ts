@@ -43,13 +43,22 @@ const addresses: Record<number, ProjectAddress[]> = {
 
 const credentials: Record<number, ProjectCredential[]> = {
   1: [
-    { id: 1, name: '演示账号', username: 'portal_demo', password: 'DemoPortal2026', environment: '演示', description: '门户演示账号，仅用于内部培训。' },
-    { id: 2, name: '管理员账号', username: 'portal_admin', password: 'AdminPortal2026', environment: '正式', description: '超级管理员仅限平台管理员使用。' },
+    { id: 1, name: '演示账号', username: 'portal_demo', passwordMasked: '************', environment: '演示', description: '门户演示账号，仅用于内部培训。' },
+    { id: 2, name: '管理员账号', username: 'portal_admin', passwordMasked: '************', environment: '正式', description: '超级管理员仅限平台管理员使用。' },
   ],
-  2: [{ id: 3, name: '客户演示账号', username: 'delivery_demo', password: 'DeliveryDemo2026', environment: '演示', description: '客户验收演示账号。' }],
-  3: [{ id: 4, name: '测试账号', username: 'prototype_demo', password: 'PrototypeDemo2026', environment: '测试', description: '供产品经理体验 AI 原型生成。' }],
-  4: [{ id: 5, name: '经营查看账号', username: 'bi_viewer', password: 'BiViewer2026', environment: '正式', description: '经营层查看账号。' }],
-  5: [{ id: 6, name: '监控查看账号', username: 'ops_viewer', password: 'OpsViewer2026', environment: '正式', description: '查看服务状态与告警。' }],
+  2: [{ id: 3, name: '客户演示账号', username: 'delivery_demo', passwordMasked: '************', environment: '演示', description: '客户验收演示账号。' }],
+  3: [{ id: 4, name: '测试账号', username: 'prototype_demo', passwordMasked: '************', environment: '测试', description: '供产品经理体验 AI 原型生成。' }],
+  4: [{ id: 5, name: '经营查看账号', username: 'bi_viewer', passwordMasked: '************', environment: '正式', description: '经营层查看账号。' }],
+  5: [{ id: 6, name: '监控查看账号', username: 'ops_viewer', passwordMasked: '************', environment: '正式', description: '查看服务状态与告警。' }],
+}
+
+const credentialSecrets: Record<number, string> = {
+  1: 'DemoPortal2026',
+  2: 'AdminPortal2026',
+  3: 'DeliveryDemo2026',
+  4: 'PrototypeDemo2026',
+  5: 'BiViewer2026',
+  6: 'OpsViewer2026',
 }
 
 const qrcodes: Record<number, ProjectQrcode[]> = {
@@ -92,7 +101,7 @@ if (MOCK_ENABLED) {
         const { username, password } = body as { username: string; password: string }
         if (username === 'admin' && password === '123456') {
           return {
-            code: 0,
+            code: 200,
             data: {
               token: 'mock-token-one-platform-2026',
               user: { id: 1, name: '张明', email: 'admin@one-platform.local', avatar: '', role: 'admin' },
@@ -102,15 +111,15 @@ if (MOCK_ENABLED) {
         }
         return { code: 401, data: null, message: '用户名或密码错误' }
       },
-      '/api/auth/logout': () => ({ code: 0, message: '已退出登录' }),
-      '/api/portal/action-log': () => ({ code: 0, data: true, message: '已记录' }),
+      '/api/auth/logout': () => ({ code: 200, data: true, message: '已退出登录' }),
+      '/app/portal/action-log': () => ({ code: 200, data: true, message: '已记录' }),
     },
     GET: {
       '/api/auth/me': () => ({
-        code: 0,
+        code: 200,
         data: { id: 1, name: '张明', email: 'admin@one-platform.local', avatar: '', role: 'admin' },
       }),
-      '/api/portal/projects': (_, params) => {
+      '/app/portal/projects': (_, params) => {
         const keyword = params.get('keyword') || ''
         const category = params.get('category') || ''
         const status = params.get('status') || ''
@@ -122,14 +131,7 @@ if (MOCK_ENABLED) {
             )
           return matchKeyword && (!category || project.category === category) && (!status || project.status === status)
         })
-        return { code: 0, data: list, message: '获取成功' }
-      },
-      '/api/portal/project-detail': (_, params) => {
-        try {
-          return { code: 0, data: projectDetail(Number(params.get('id'))), message: '获取成功' }
-        } catch (error) {
-          return { code: 404, data: null, message: error instanceof Error ? error.message : '项目不存在' }
-        }
+        return { code: 200, data: list, message: '获取成功' }
       },
     },
   }
@@ -140,7 +142,36 @@ if (MOCK_ENABLED) {
     const rawUrl = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url
     const parsedUrl = new URL(rawUrl, window.location.origin)
     const method = (init?.method || 'GET').toUpperCase()
-    const handler = mockRoutes[method]?.[parsedUrl.pathname]
+    let handler = mockRoutes[method]?.[parsedUrl.pathname]
+    if (!handler && method === 'GET') {
+      const detailMatch = parsedUrl.pathname.match(/^\/app\/portal\/projects\/(\d+)$/)
+      if (detailMatch) {
+        handler = () => {
+          try {
+            return { code: 200, data: projectDetail(Number(detailMatch[1])), message: '获取成功' }
+          } catch (error) {
+            return { code: 404, data: null, message: error instanceof Error ? error.message : '项目不存在' }
+          }
+        }
+      }
+    }
+    if (!handler && method === 'POST') {
+      const revealMatch = parsedUrl.pathname.match(/^\/app\/portal\/credentials\/(\d+)\/reveal$/)
+      const copyMatch = parsedUrl.pathname.match(/^\/app\/portal\/credentials\/(\d+)\/copy$/)
+      if (revealMatch) {
+        handler = () => ({ code: 200, data: credentialSecrets[Number(revealMatch[1])] || '', message: '获取成功' })
+      }
+      if (copyMatch) {
+        handler = (body) => {
+          const field = (body as { field?: string })?.field
+          const credential = Object.values(credentials)
+            .flat()
+            .find((item) => item.id === Number(copyMatch[1]))
+          const value = field === 'password' ? credentialSecrets[Number(copyMatch[1])] || '' : credential?.username || ''
+          return { code: 200, data: value, message: '复制成功' }
+        }
+      }
+    }
 
     if (handler) {
       await new Promise((resolve) => setTimeout(resolve, 220))

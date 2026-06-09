@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: one-platform-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_2026
+      MYSQL_DATABASE: one_platform
+      MYSQL_USER: one_platform
+      MYSQL_PASSWORD: one_platform_2026
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - one-platform-mysql-data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+
+volumes:
+  one-platform-mysql-data:

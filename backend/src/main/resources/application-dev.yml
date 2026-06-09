@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${ONE_PLATFORM_DB_URL:jdbc:mysql://127.0.0.1:3306/one_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${ONE_PLATFORM_DB_USERNAME:one_platform}
+    password: ${ONE_PLATFORM_DB_PASSWORD:one_platform_2026}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+logging:
+  level:
+    com.oneplatform.backend: info
+
+oneplatform:
+  portal:
+    allow-dev-fallback-user: ${ONE_PLATFORM_PORTAL_DEV_FALLBACK:true}

@@ -1,0 +1,33 @@
+server:
+  port: 7001
+
+spring:
+  application:
+    name: one-platform-backend
+  profiles:
+    active: dev
+  jackson:
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+oneplatform:
+  security:
+    jwt-secret: ${ONE_PLATFORM_JWT_SECRET:dev-secret-change-me-please-change-me}
+    access-token-minutes: ${ONE_PLATFORM_ACCESS_TOKEN_MINUTES:120}
+  init:
+    admin-password: ${ONE_PLATFORM_ADMIN_PASSWORD:Admin123456}
+  portal:
+    allow-dev-fallback-user: false
+    dev-fallback-user-id: 1
+  credential:
+    secret-key: ${ONE_PLATFORM_CREDENTIAL_SECRET_KEY:T25lUGxhdGZvcm0yMDI2Q3JlZGVudGlhbEtleTAwMDE=}

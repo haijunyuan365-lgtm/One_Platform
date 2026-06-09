@@ -44,14 +44,19 @@ export function getDepartmentList(params?: { name?: string; status?: number | st
         const data = getDepartmentListMock(params)
         resolve({
           code: 200,
-          data,
+          data: {
+            list: data,
+            total: data.length,
+            page: 1,
+            pageSize: data.length
+          },
           message: '获取部门列表成功'
         })
       }, 300)
     })
   }
 
-  return request.get<Department[]>({
+  return request.get({
     url: '/admin/organization/department/list',
     params
   })

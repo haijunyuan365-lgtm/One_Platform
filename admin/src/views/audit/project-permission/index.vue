@@ -154,7 +154,8 @@
     ])
     projectOptions.value = projectRes.data
     departments.value = []
-    flattenDepartments(deptRes.data)
+    const deptList = Array.isArray(deptRes.data) ? deptRes.data : deptRes.data.list || []
+    flattenDepartments(deptList)
     roles.value = (roleRes.data.list as Role[]).map((item) => ({ label: item.name, value: item.id }))
     users.value = (userRes.data.list as AdminUser[]).map((item) => ({ label: item.realName || item.username, value: item.id }))
   }

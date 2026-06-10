@@ -124,10 +124,10 @@
 
   <div v-if="detailVisible" class="modal-mask" @click.self="closeDetail">
     <section class="detail-modal">
+      <button type="button" class="modal-close-btn" aria-label="Close detail" @click="closeDetail">
+        <ElIcon><Close /></ElIcon>
+      </button>
       <aside class="detail-aside">
-        <button class="close-btn" @click="closeDetail">
-          <ElIcon><Close /></ElIcon>
-        </button>
         <div class="detail-logo-wrap">
           <img :src="detail?.project.logo" :alt="detail?.project.name" />
         </div>
@@ -141,9 +141,6 @@
       </aside>
 
       <div class="detail-content">
-        <button type="button" class="modal-close-mobile" @click="closeDetail">
-          <ElIcon><Close /></ElIcon>
-        </button>
         <nav class="detail-tabs">
           <button v-for="tab in tabs" :key="tab.key" type="button" :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
             <ElIcon>
@@ -153,7 +150,7 @@
           </button>
         </nav>
 
-        <div v-if="store.detailLoading" class="modal-state">加载中...</div>
+        <div v-if="store.detailLoading || detailPreparing" class="modal-state">加载中...</div>
         <div v-else-if="detail" class="detail-body">
           <section v-if="activeTab === 'basic'" class="detail-section">
             <dl class="info-list">
@@ -166,73 +163,67 @@
             </dl>
           </section>
 
-          <section v-if="activeTab === 'entry'" class="detail-section entry-layout">
+          <section v-if="activeTab === 'entry'" class="detail-section">
             <div class="entry-group">
               <div class="section-heading">
-                <strong>访问地址</strong>
-                <span>{{ detail.addresses.length }} 个入口</span>
+                <strong>访问入口</strong>
+                <span>{{ projectEntries.length }} 个入口</span>
               </div>
-              <div v-if="detail.addresses.length === 0" class="modal-state">暂未配置访问地址</div>
-              <div v-else class="resource-list">
-                <div v-for="address in detail.addresses" :key="address.id" class="resource-row">
-                  <div>
-                    <strong>{{ address.name }}</strong>
-                    <span>{{ address.type }} · {{ address.url }}</span>
+              <div v-if="projectEntries.length === 0" class="modal-state">暂未配置访问入口</div>
+              <div v-else class="entry-table">
+                <div
+                  v-for="entry in projectEntries"
+                  :key="entry.key"
+                  class="resource-row entry-row"
+                  :class="{ 'entry-qrcode-row': entry.kind === 'qrcode' }"
+                >
+                  <div class="entry-info">
+                    <span class="entry-type">{{ entry.typeLabel }}</span>
+                    <div class="entry-info-main">
+                      <strong>{{ entry.name }}</strong>
+                      <span>{{ entry.description }}</span>
+                      <div v-if="entry.kind === 'address'" class="resource-actions entry-actions">
+                        <button type="button" @click="openAddress(entry.url)">
+                          <ElIcon><Link /></ElIcon>
+                          打开
+                        </button>
+                        <button type="button" @click="copyText(entry.url, '地址已复制')">
+                          <ElIcon><CopyDocument /></ElIcon>
+                          复制
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div class="resource-actions">
-                    <button type="button" @click="openAddress(address.url)">
-                      <ElIcon><Link /></ElIcon>
-                      打开
-                    </button>
-                    <button type="button" @click="copyText(address.url, '地址已复制')">
-                      <ElIcon><CopyDocument /></ElIcon>
-                      复制
-                    </button>
+
+                  <div class="entry-credential-cell">
+                    <span v-if="entry.credentials.length === 0" class="entry-empty">无账号</span>
+                    <div
+                      v-for="credential in entry.credentials"
+                      :key="credential.id"
+                      class="entry-credential-inline"
+                    >
+                      <strong>{{ credential.name }} · {{ credential.environment }}</strong>
+                      <div>
+                        <span>账号：{{ credential.username }}</span>
+                        <span>密码：{{ visiblePassword(credential) }}</span>
+                      </div>
+                      <div class="resource-actions credential-actions">
+                        <button type="button" @click="copyCredential(credential.id, 'username')">
+                          <ElIcon><CopyDocument /></ElIcon>
+                          账号
+                        </button>
+                        <button type="button" @click="copyCredential(credential.id, 'password')">
+                          <ElIcon><Key /></ElIcon>
+                          密码
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
 
-            <div class="entry-group">
-              <div class="section-heading">
-                <strong>小程序入口</strong>
-                <span>{{ detail.qrcodes.length }} 个二维码</span>
-              </div>
-              <div v-if="detail.qrcodes.length === 0" class="modal-state">暂未配置小程序二维码</div>
-              <div v-else class="qrcode-grid">
-                <div v-for="qrcode in detail.qrcodes" :key="qrcode.id" class="qrcode-card">
-                  <img :src="qrcode.image" :alt="qrcode.name" />
-                  <strong>{{ qrcode.name }}</strong>
-                  <span>{{ qrcode.audience }}</span>
-                  <p>{{ qrcode.description }}</p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section v-if="activeTab === 'credential'" class="detail-section">
-            <div v-if="detail.credentials.length === 0" class="modal-state">暂无可查看账号凭据</div>
-            <div v-else class="resource-list">
-              <div v-for="credential in detail.credentials" :key="credential.id" class="resource-row credential-row">
-                <div>
-                  <strong>{{ credential.name }} · {{ credential.environment }}</strong>
-                  <span>账号：{{ credential.username }}</span>
-                  <span>密码：{{ revealedPasswords[credential.id] || credential.passwordMasked || '************' }}</span>
-                  <small>{{ credential.description }}</small>
-                </div>
-                <div class="resource-actions">
-                  <button type="button" @click="revealPassword(credential.id)">
-                    <ElIcon><View /></ElIcon>
-                    查看
-                  </button>
-                  <button type="button" @click="copyCredential(credential.id, 'username')">
-                    <ElIcon><CopyDocument /></ElIcon>
-                    复制账号
-                  </button>
-                  <button type="button" @click="copyCredential(credential.id, 'password')">
-                    <ElIcon><Key /></ElIcon>
-                    复制密码
-                  </button>
+                  <div v-if="entry.kind === 'qrcode'" class="entry-qrcode-cell">
+                    <img :src="entry.image" :alt="entry.name" class="entry-qrcode-thumb" />
+                    <span>{{ entry.audience }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -266,25 +257,95 @@ import {
   View,
 } from '@element-plus/icons-vue'
 import { usePortalStore } from '@/stores/portal'
-import type { ProjectCategory, ProjectStatus } from '@/types/project'
+import type { ProjectAddress, ProjectCategory, ProjectCredential, ProjectStatus } from '@/types/project'
+
+type ProjectEntry =
+  | {
+      key: string
+      kind: 'address'
+      id: number
+      typeLabel: string
+      name: string
+      description: string
+      url: string
+      credentials: ProjectCredential[]
+    }
+  | {
+      key: string
+      kind: 'qrcode'
+      id: number
+      typeLabel: string
+      name: string
+      description: string
+      image: string
+      audience: string
+      credentials: ProjectCredential[]
+    }
 
 const store = usePortalStore()
 const detailVisible = ref(false)
-const activeTab = ref('basic')
+const activeTab = ref('entry')
 const revealedPasswords = ref<Record<number, string>>({})
+const detailPreparing = ref(false)
 const toastMessage = ref('')
 let toastTimer: number | undefined
 
 const categoryOptions: ProjectCategory[] = ['内部系统', '客户项目', 'AI工具', '数据平台', '运维服务', '小程序']
 const statusOptions: ProjectStatus[] = ['可用', '异常', '维护中', '未检测']
 const tabs = [
-  { key: 'basic', label: '基本信息', icon: Monitor },
   { key: 'entry', label: '访问入口', icon: Link },
-  { key: 'credential', label: '账号凭据', icon: Key },
+  { key: 'basic', label: '基本信息', icon: Monitor },
   { key: 'instruction', label: '访问说明', icon: Reading },
 ]
 
 const detail = computed(() => store.detail)
+const projectEntries = computed<ProjectEntry[]>(() => {
+  if (!detail.value) return []
+
+  const addressEntries: ProjectEntry[] = detail.value.addresses.map((address) => ({
+    key: `address-${address.id}`,
+    kind: 'address',
+    id: address.id,
+    typeLabel: address.type,
+    name: address.name,
+    description: address.url,
+    url: address.url,
+    credentials: credentialsForAddress(address.id),
+  }))
+
+  const qrcodeEntries: ProjectEntry[] = detail.value.qrcodes.map((qrcode) => ({
+    key: `qrcode-${qrcode.id}`,
+    kind: 'qrcode',
+    id: qrcode.id,
+    typeLabel: '小程序',
+    name: qrcode.name,
+    description: qrcode.description,
+    image: qrcode.image,
+    audience: qrcode.audience,
+    credentials: [],
+  }))
+
+  return [...addressEntries, ...qrcodeEntries]
+})
+const credentialsByAddressId = computed<Record<number, ProjectCredential[]>>(() => {
+  if (!detail.value) return {}
+
+  const result = detail.value.addresses.reduce<Record<number, ProjectCredential[]>>((groups, address) => {
+    groups[address.id] = []
+    return groups
+  }, {})
+  const fallbackAddress = detail.value.addresses.find((address) => address.isDefault === 1) || detail.value.addresses[0]
+
+  for (const credential of detail.value.credentials) {
+    const matchedAddress =
+      detail.value.addresses.find((address) => isCredentialForAddress(credential, address)) || fallbackAddress
+    if (matchedAddress) {
+      result[matchedAddress.id] = [...(result[matchedAddress.id] || []), credential]
+    }
+  }
+
+  return result
+})
 const statusCounts = computed<Record<ProjectStatus, number>>(() => {
   return statusOptions.reduce((result, status) => {
     result[status] = store.projects.filter((project) => project.status === status).length
@@ -303,6 +364,52 @@ function statusClass(status: ProjectStatus) {
   }
 }
 
+function credentialsForAddress(addressId: number) {
+  return credentialsByAddressId.value[addressId] || []
+}
+
+function visiblePassword(credential: ProjectCredential) {
+  const credentialWithPassword = credential as ProjectCredential & { password?: string }
+  return revealedPasswords.value[credential.id] || credentialWithPassword.password || credential.passwordMasked || '************'
+}
+
+function isCredentialForAddress(credential: ProjectCredential, address: ProjectAddress) {
+  const credentialWithAddress = credential as ProjectCredential & { addressId?: number }
+  if (credentialWithAddress.addressId !== undefined) return credentialWithAddress.addressId === address.id
+
+  const addressText = `${address.name} ${address.type}`.toLowerCase()
+  const credentialText = `${credential.name} ${credential.environment}`.toLowerCase()
+  const addressKeywords = keywordsForAddress(address)
+  const credentialKeywords = keywordsForCredential(credential)
+
+  return (
+    credentialKeywords.some((keyword) => addressText.includes(keyword)) ||
+    addressKeywords.some((keyword) => credentialText.includes(keyword))
+  )
+}
+
+function keywordsForAddress(address: ProjectAddress) {
+  const source = `${address.name} ${address.type}`.toLowerCase()
+  const keywords: string[] = []
+  if (source.includes('正式')) keywords.push('正式')
+  if (source.includes('测试')) keywords.push('测试')
+  if (source.includes('演示')) keywords.push('演示')
+  if (source.includes('后台')) keywords.push('后台', '管理')
+  if (source.includes('文档')) keywords.push('文档')
+  return keywords
+}
+
+function keywordsForCredential(credential: ProjectCredential) {
+  const source = `${credential.name} ${credential.environment}`.toLowerCase()
+  const keywords: string[] = []
+  if (source.includes('正式')) keywords.push('正式')
+  if (source.includes('测试')) keywords.push('测试')
+  if (source.includes('演示')) keywords.push('演示')
+  if (source.includes('后台') || source.includes('管理')) keywords.push('后台', '管理')
+  if (source.includes('文档')) keywords.push('文档')
+  return keywords
+}
+
 async function loadProjects() {
   await store.loadProjects()
 }
@@ -319,9 +426,15 @@ function resetFilters() {
 
 async function openProject(projectId: number) {
   revealedPasswords.value = {}
-  activeTab.value = 'basic'
+  activeTab.value = 'entry'
+  detailPreparing.value = true
   detailVisible.value = true
-  await store.openDetail(projectId)
+  try {
+    await store.openDetail(projectId)
+    await loadVisiblePasswords()
+  } finally {
+    detailPreparing.value = false
+  }
 }
 
 function closeDetail() {
@@ -347,16 +460,25 @@ function showToast(message: string) {
   }, 1800)
 }
 
-async function revealPassword(id: number) {
-  revealedPasswords.value = {
-    ...revealedPasswords.value,
-    [id]: await store.revealPassword(id),
-  }
-}
-
 async function copyCredential(id: number, field: 'username' | 'password') {
   const text = await store.copyCredential(id, field)
   await copyText(text, field === 'password' ? '密码已复制' : '账号已复制')
+}
+
+async function loadVisiblePasswords() {
+  const credentials = detail.value?.credentials || []
+  if (credentials.length === 0) return
+
+  const passwordEntries = await Promise.all(
+    credentials.map(async (credential) => {
+      try {
+        return [credential.id, await store.revealPassword(credential.id)] as const
+      } catch {
+        return [credential.id, credential.passwordMasked || '************'] as const
+      }
+    }),
+  )
+  revealedPasswords.value = Object.fromEntries(passwordEntries)
 }
 
 onMounted(loadProjects)
@@ -402,8 +524,7 @@ onMounted(loadProjects)
 .portal-main {
   position: relative;
   z-index: 1;
-  width: min(1320px, 100%);
-  margin: 0 auto;
+  width: 100%;
 }
 
 .hero-band {
@@ -456,8 +577,7 @@ onMounted(loadProjects)
 .hero-copy h1,
 .detail-aside h2,
 .project-card h2,
-.hero-copy p,
-.qrcode-card p {
+.hero-copy p {
   margin: 0;
 }
 
@@ -517,10 +637,12 @@ onMounted(loadProjects)
 }
 
 .filter-panel {
-  display: grid;
-  grid-template-columns: minmax(280px, 1fr) 150px 150px auto auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
+  width: fit-content;
+  max-width: 100%;
   margin-top: -26px;
   padding: 14px;
   border: 1px solid rgba(217, 225, 235, 0.9);
@@ -539,6 +661,8 @@ onMounted(loadProjects)
 }
 
 .search-control {
+  width: clamp(360px, 38vw, 620px);
+  flex: 0 1 620px;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -560,6 +684,8 @@ onMounted(loadProjects)
 }
 
 .filter-select {
+  width: 150px;
+  flex: 0 0 150px;
   padding: 0 12px;
 }
 
@@ -589,6 +715,12 @@ button {
 }
 
 .primary-btn,
+.ghost-btn {
+  flex: 0 0 auto;
+  min-width: 82px;
+}
+
+.primary-btn,
 .detail-btn {
   color: #fff;
   background: #1e63d6;
@@ -609,18 +741,21 @@ button {
 }
 
 .overview-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 14px;
 }
 
 .status-summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 62px;
-  padding: 0 18px;
+  width: clamp(176px, 12vw, 220px);
+  height: 48px;
+  padding: 0 14px;
   border: 1px solid #dde6ef;
   border-radius: 8px;
   color: #172033;
@@ -650,7 +785,7 @@ button {
 }
 
 .status-summary strong {
-  font-size: 22px;
+  font-size: 20px;
 }
 
 .summary-dot,
@@ -677,7 +812,7 @@ button {
 
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 14px;
 }
 
@@ -744,7 +879,7 @@ button {
   object-fit: cover;
 }
 
-.close-btn {
+.modal-close-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -771,7 +906,6 @@ button {
 .card-title-line div > span,
 .project-desc,
 .modal-state,
-.qrcode-card span,
 .resource-row span,
 .resource-row small,
 .info-list dt,
@@ -882,18 +1016,19 @@ button {
   inset: 0;
   z-index: 80;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 58px 20px 24px;
+  padding: 24px 20px;
   background: rgba(12, 19, 33, 0.58);
   backdrop-filter: blur(10px);
 }
 
 .detail-modal {
-  width: min(1140px, calc(100vw - 48px));
-  height: min(700px, calc(100vh - 84px));
+  position: relative;
+  width: min(1080px, calc(100vw - 48px));
+  height: min(640px, calc(100vh - 48px));
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: 300px minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 8px;
@@ -910,12 +1045,14 @@ button {
     #102033;
 }
 
-.close-btn {
+.modal-close-btn {
   position: absolute;
   top: 16px;
-  right: 16px;
-  color: #e8f0fa;
-  background: rgba(255, 255, 255, 0.12);
+  right: 18px;
+  z-index: 3;
+  color: #526078;
+  background: #eef3f8;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
 }
 
 .detail-logo-wrap {
@@ -963,15 +1100,11 @@ button {
   background: #f7f9fb;
 }
 
-.modal-close-mobile {
-  display: none;
-}
-
 .detail-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 16px 18px;
+  padding: 16px 76px 16px 18px;
   border-bottom: 1px solid #dfe7ef;
   background: #fff;
 }
@@ -1000,7 +1133,7 @@ button {
 }
 
 .detail-section {
-  min-height: 100%;
+  min-height: auto;
 }
 
 .info-list {
@@ -1011,8 +1144,7 @@ button {
 }
 
 .info-list div,
-.resource-row,
-.qrcode-card {
+.resource-row {
   border: 1px solid #dde6ef;
   border-radius: 8px;
   background: #fff;
@@ -1033,17 +1165,104 @@ button {
   grid-column: 1 / -1;
 }
 
-.entry-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
-  gap: 14px;
-  align-items: start;
-}
-
 .entry-group,
-.resource-list {
+.resource-list,
+.entry-table {
   display: grid;
   gap: 12px;
+}
+
+.entry-row {
+  display: grid;
+  grid-template-columns: minmax(340px, 1.05fr) minmax(360px, 1fr);
+  align-items: center;
+  min-height: 82px;
+}
+
+.entry-qrcode-row {
+  grid-template-columns: minmax(340px, 1.05fr) minmax(260px, 1fr) auto;
+}
+
+.entry-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.entry-info-main {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.entry-info-main .entry-actions {
+  justify-content: flex-start;
+  margin-top: 2px;
+}
+
+.entry-type {
+  flex: 0 0 auto;
+  min-width: 50px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  text-align: center;
+  color: #1d4d7b;
+  background: #e6f0f9;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.entry-credential-cell {
+  min-width: 0;
+}
+
+.entry-credential-inline {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.75fr) minmax(190px, 1.35fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.entry-credential-inline > div:first-of-type {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  min-width: 0;
+}
+
+.entry-empty {
+  color: #8a96a8;
+  font-size: 13px;
+}
+
+.entry-actions,
+.credential-actions {
+  flex-wrap: nowrap;
+}
+
+.credential-actions button,
+.entry-actions button {
+  height: 32px;
+  padding: 0 9px;
+  font-size: 12px;
+}
+
+.entry-qrcode-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 104px;
+}
+
+.entry-qrcode-thumb {
+  width: 54px;
+  height: 54px;
+  border: 1px solid #dde6ef;
+  border-radius: 8px;
+  object-fit: cover;
 }
 
 .section-heading {
@@ -1060,7 +1279,7 @@ button {
   padding: 14px;
 }
 
-.resource-row > div:first-child {
+.resource-row:not(.entry-row) > div:first-child {
   display: grid;
   gap: 6px;
   min-width: 0;
@@ -1088,36 +1307,6 @@ button {
   box-shadow: none;
 }
 
-.credential-row {
-  align-items: flex-start;
-}
-
-.qrcode-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 12px;
-}
-
-.qrcode-card {
-  display: grid;
-  gap: 8px;
-  padding: 14px;
-}
-
-.qrcode-card img {
-  width: 116px;
-  height: 116px;
-  border: 1px solid #dde6ef;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.qrcode-card p {
-  color: #68758a;
-  font-size: 13px;
-  line-height: 1.55;
-}
-
 @media (max-width: 1080px) {
   .hero-band {
     grid-template-columns: 1fr;
@@ -1128,7 +1317,24 @@ button {
   }
 
   .filter-panel {
-    grid-template-columns: minmax(240px, 1fr) 1fr 1fr auto auto;
+    width: 100%;
+  }
+
+  .search-control {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .filter-select {
+    flex: 1 1 180px;
+  }
+
+  .overview-strip {
+    width: 100%;
+  }
+
+  .status-summary {
+    flex: 1 1 180px;
   }
 }
 
@@ -1146,16 +1352,26 @@ button {
   }
 
   .hero-metrics,
-  .overview-strip,
-  .filter-panel,
-  .entry-layout,
   .info-list {
     grid-template-columns: 1fr;
   }
 
+  .filter-panel,
+  .overview-strip {
+    width: 100%;
+  }
+
+  .filter-select,
+  .primary-btn,
+  .ghost-btn,
+  .status-summary {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
   .detail-modal {
     width: calc(100vw - 24px);
-    height: calc(100vh - 70px);
+    height: calc(100vh - 44px);
     grid-template-columns: 1fr;
   }
 
@@ -1163,19 +1379,11 @@ button {
     display: none;
   }
 
-  .modal-close-mobile {
-    position: absolute;
+  .modal-close-btn {
     top: 12px;
     right: 12px;
-    z-index: 2;
     width: 36px;
     height: 36px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    color: #526078;
-    background: #eef3f8;
   }
 
   .detail-tabs {
@@ -1183,14 +1391,18 @@ button {
   }
 
   .modal-mask {
-    padding: 48px 12px 18px;
+    padding: 22px 12px;
   }
 
-  .resource-row {
+  .resource-row,
+  .entry-row,
+  .entry-credential-inline {
     display: grid;
+    grid-template-columns: 1fr;
   }
 
-  .resource-actions {
+  .resource-actions,
+  .entry-qrcode-cell {
     justify-content: flex-start;
   }
 }

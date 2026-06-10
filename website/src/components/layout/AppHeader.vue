@@ -148,12 +148,11 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 }
 
 .header-inner {
-  width: min(1320px, 100%);
+  width: 100%;
   height: 70px;
   display: flex;
   align-items: center;
   gap: 22px;
-  margin: 0 auto;
   padding: 0 24px;
 }
 

@@ -16,7 +16,9 @@ declare module 'vue' {
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     LoginModal: typeof import('./components/common/LoginModal.vue')['default']
+    ProjectDetailModal: typeof import('./components/common/ProjectDetailModal.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TechFluidScene: typeof import('./components/common/TechFluidScene.vue')['default']
   }
 }

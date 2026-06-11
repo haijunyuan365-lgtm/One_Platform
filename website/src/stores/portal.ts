@@ -29,7 +29,7 @@ export const usePortalStore = defineStore('portal', () => {
     detailLoading.value = true
     try {
       detail.value = await getPortalProjectDetail(projectId)
-      await recordPortalAction(projectId, '打开项目详情', '项目详情')
+      void recordPortalAction(projectId, '打开项目详情', '项目详情').catch(() => undefined)
     } finally {
       detailLoading.value = false
     }

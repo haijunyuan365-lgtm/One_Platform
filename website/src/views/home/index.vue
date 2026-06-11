@@ -150,7 +150,7 @@
           </button>
         </nav>
 
-        <div v-if="store.detailLoading || detailPreparing" class="modal-state">加载中...</div>
+        <div v-if="store.detailLoading" class="modal-state">加载中...</div>
         <div v-else-if="detail" class="detail-body">
           <section v-if="activeTab === 'basic'" class="detail-section">
             <dl class="info-list">
@@ -175,23 +175,30 @@
                   v-for="entry in projectEntries"
                   :key="entry.key"
                   class="resource-row entry-row"
-                  :class="{ 'entry-qrcode-row': entry.kind === 'qrcode' }"
+                  :class="{
+                    'entry-qrcode-row': entry.kind === 'qrcode',
+                    'entry-plain-row': entry.kind === 'address' && entry.credentials.length === 0,
+                    'entry-no-credential-row': entry.credentials.length === 0,
+                  }"
                 >
-                  <div class="entry-info">
-                    <span class="entry-type">{{ entry.typeLabel }}</span>
-                    <div class="entry-info-main">
-                      <strong>{{ entry.name }}</strong>
-                      <span>{{ entry.description }}</span>
-                      <div v-if="entry.kind === 'address'" class="resource-actions entry-actions">
-                        <button type="button" @click="openAddress(entry.url)">
-                          <ElIcon><Link /></ElIcon>
-                          打开
-                        </button>
-                        <button type="button" @click="copyText(entry.url, '地址已复制')">
-                          <ElIcon><CopyDocument /></ElIcon>
-                          复制
-                        </button>
-                      </div>
+                  <span class="entry-type">{{ entry.typeLabel }}</span>
+
+                  <div class="entry-address-cell">
+                    <strong>{{ entry.name }}</strong>
+                    <span>{{ entry.description }}</span>
+                    <div v-if="entry.kind === 'qrcode'" class="entry-qrcode-inline">
+                      <img :src="entry.image" :alt="entry.name" class="entry-qrcode-thumb" />
+                      <span>{{ entry.audience }}</span>
+                    </div>
+                    <div v-if="entry.kind === 'address'" class="resource-actions entry-actions">
+                      <button type="button" @click="openAddress(entry.url)">
+                        <ElIcon><Link /></ElIcon>
+                        打开
+                      </button>
+                      <button type="button" @click="copyText(entry.url, '地址已复制')">
+                        <ElIcon><CopyDocument /></ElIcon>
+                        复制
+                      </button>
                     </div>
                   </div>
 
@@ -203,7 +210,7 @@
                       class="entry-credential-inline"
                     >
                       <strong>{{ credential.name }} · {{ credential.environment }}</strong>
-                      <div>
+                      <div class="entry-account-lines">
                         <span>账号：{{ credential.username }}</span>
                         <span>密码：{{ visiblePassword(credential) }}</span>
                       </div>
@@ -218,11 +225,6 @@
                         </button>
                       </div>
                     </div>
-                  </div>
-
-                  <div v-if="entry.kind === 'qrcode'" class="entry-qrcode-cell">
-                    <img :src="entry.image" :alt="entry.name" class="entry-qrcode-thumb" />
-                    <span>{{ entry.audience }}</span>
                   </div>
                 </div>
               </div>
@@ -286,9 +288,9 @@ const store = usePortalStore()
 const detailVisible = ref(false)
 const activeTab = ref('entry')
 const revealedPasswords = ref<Record<number, string>>({})
-const detailPreparing = ref(false)
 const toastMessage = ref('')
 let toastTimer: number | undefined
+let passwordLoadToken = 0
 
 const categoryOptions: ProjectCategory[] = ['内部系统', '客户项目', 'AI工具', '数据平台', '运维服务', '小程序']
 const statusOptions: ProjectStatus[] = ['可用', '异常', '维护中', '未检测']
@@ -427,14 +429,10 @@ function resetFilters() {
 async function openProject(projectId: number) {
   revealedPasswords.value = {}
   activeTab.value = 'entry'
-  detailPreparing.value = true
   detailVisible.value = true
-  try {
-    await store.openDetail(projectId)
-    await loadVisiblePasswords()
-  } finally {
-    detailPreparing.value = false
-  }
+  const token = ++passwordLoadToken
+  await store.openDetail(projectId)
+  void loadVisiblePasswords(token)
 }
 
 function closeDetail() {
@@ -465,8 +463,8 @@ async function copyCredential(id: number, field: 'username' | 'password') {
   await copyText(text, field === 'password' ? '密码已复制' : '账号已复制')
 }
 
-async function loadVisiblePasswords() {
-  const credentials = detail.value?.credentials || []
+async function loadVisiblePasswords(token: number) {
+  const credentials = (detail.value?.credentials || []).filter((credential) => !credential.password)
   if (credentials.length === 0) return
 
   const passwordEntries = await Promise.all(
@@ -478,7 +476,11 @@ async function loadVisiblePasswords() {
       }
     }),
   )
-  revealedPasswords.value = Object.fromEntries(passwordEntries)
+  if (token !== passwordLoadToken) return
+  revealedPasswords.value = {
+    ...revealedPasswords.value,
+    ...Object.fromEntries(passwordEntries),
+  }
 }
 
 onMounted(loadProjects)
@@ -641,8 +643,7 @@ onMounted(loadProjects)
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-  width: fit-content;
-  max-width: 100%;
+  width: 100%;
   margin-top: -26px;
   padding: 14px;
   border: 1px solid rgba(217, 225, 235, 0.9);
@@ -661,8 +662,9 @@ onMounted(loadProjects)
 }
 
 .search-control {
-  width: clamp(360px, 38vw, 620px);
-  flex: 0 1 620px;
+  width: auto;
+  flex: 1 1 320px;
+  min-width: 280px;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -718,6 +720,7 @@ button {
 .ghost-btn {
   flex: 0 0 auto;
   min-width: 82px;
+  white-space: nowrap;
 }
 
 .primary-btn,
@@ -1026,7 +1029,7 @@ button {
 .detail-modal {
   position: relative;
   width: min(1080px, calc(100vw - 48px));
-  height: min(640px, calc(100vh - 48px));
+  height: min(560px, calc(100vh - 48px));
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
   overflow: hidden;
@@ -1129,6 +1132,7 @@ button {
   flex: 1;
   min-height: 0;
   overflow: auto;
+  overflow-x: hidden;
   padding: 18px;
 }
 
@@ -1174,35 +1178,45 @@ button {
 
 .entry-row {
   display: grid;
-  grid-template-columns: minmax(340px, 1.05fr) minmax(360px, 1fr);
+  grid-template-columns: 72px minmax(0, 1.05fr) minmax(0, 0.95fr);
+  justify-content: stretch;
   align-items: center;
-  min-height: 82px;
+  min-height: 76px;
+}
+
+.entry-no-credential-row {
+  grid-template-columns: 72px minmax(0, 1fr);
 }
 
 .entry-qrcode-row {
-  grid-template-columns: minmax(340px, 1.05fr) minmax(260px, 1fr) auto;
+  min-height: 96px;
 }
 
-.entry-info {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  min-width: 0;
+.entry-plain-row {
+  min-height: 58px;
 }
 
-.entry-info-main {
+.entry-address-cell {
   display: grid;
-  gap: 6px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  column-gap: 16px;
+  row-gap: 6px;
+  align-items: center;
   min-width: 0;
 }
 
-.entry-info-main .entry-actions {
-  justify-content: flex-start;
-  margin-top: 2px;
+.entry-address-cell .entry-actions {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: end;
+  justify-content: flex-end;
 }
 
 .entry-type {
-  flex: 0 0 auto;
+  align-self: center;
+  width: fit-content;
   min-width: 50px;
   padding: 4px 8px;
   border-radius: 999px;
@@ -1219,20 +1233,25 @@ button {
 
 .entry-credential-inline {
   display: grid;
-  grid-template-columns: minmax(92px, 0.75fr) minmax(190px, 1.35fr) auto;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  column-gap: 16px;
+  row-gap: 6px;
   align-items: center;
   min-width: 0;
 }
 
-.entry-credential-inline > div:first-of-type {
+.entry-account-lines {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 12px;
+  gap: 6px 14px;
   min-width: 0;
 }
 
 .entry-empty {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
   color: #8a96a8;
   font-size: 13px;
 }
@@ -1240,6 +1259,53 @@ button {
 .entry-actions,
 .credential-actions {
   flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+
+.credential-actions {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: end;
+}
+
+.entry-qrcode-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.entry-qrcode-inline span {
+  overflow-wrap: anywhere;
+}
+
+.entry-no-credential-row .entry-credential-cell {
+  display: none;
+}
+
+.entry-plain-row .entry-address-cell {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.entry-plain-row .entry-address-cell > strong,
+.entry-plain-row .entry-address-cell > span {
+  flex: 0 0 auto;
+}
+
+.entry-plain-row .entry-address-cell > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry-plain-row .entry-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .credential-actions button,
@@ -1247,14 +1313,6 @@ button {
   height: 32px;
   padding: 0 9px;
   font-size: 12px;
-}
-
-.entry-qrcode-cell {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  min-width: 104px;
 }
 
 .entry-qrcode-thumb {
@@ -1401,8 +1459,33 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .entry-address-cell,
+  .entry-plain-row .entry-address-cell,
+  .entry-credential-inline {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .entry-address-cell .entry-actions,
+  .credential-actions {
+    grid-column: auto;
+    grid-row: auto;
+    justify-self: start;
+  }
+
+  .entry-plain-row .entry-address-cell > strong,
+  .entry-plain-row .entry-address-cell > span,
+  .entry-plain-row .entry-actions {
+    flex: initial;
+    margin-left: 0;
+  }
+
+  .entry-plain-row .entry-address-cell > span {
+    white-space: normal;
+  }
+
   .resource-actions,
-  .entry-qrcode-cell {
+  .entry-qrcode-inline {
     justify-content: flex-start;
   }
 }

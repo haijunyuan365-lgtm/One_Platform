@@ -43,13 +43,13 @@ const addresses: Record<number, ProjectAddress[]> = {
 
 const credentials: Record<number, ProjectCredential[]> = {
   1: [
-    { id: 1, addressId: 1, name: '演示账号', username: 'portal_demo', passwordMasked: '************', environment: '演示', description: '门户演示账号，仅用于内部培训。' },
-    { id: 2, addressId: 2, name: '管理员账号', username: 'portal_admin', passwordMasked: '************', environment: '正式', description: '超级管理员仅限平台管理员使用。' },
+    { id: 1, addressId: 1, name: '演示账号', username: 'portal_demo', password: 'DemoPortal2026', passwordMasked: '************', environment: '演示', description: '门户演示账号，仅用于内部培训。' },
+    { id: 2, addressId: 2, name: '管理员账号', username: 'portal_admin', password: 'AdminPortal2026', passwordMasked: '************', environment: '正式', description: '超级管理员仅限平台管理员使用。' },
   ],
-  2: [{ id: 3, addressId: 3, name: '客户演示账号', username: 'delivery_demo', passwordMasked: '************', environment: '演示', description: '客户验收演示账号。' }],
-  3: [{ id: 4, addressId: 5, name: '测试账号', username: 'prototype_demo', passwordMasked: '************', environment: '测试', description: '供产品经理体验 AI 原型生成。' }],
-  4: [{ id: 5, addressId: 7, name: '经营查看账号', username: 'bi_viewer', passwordMasked: '************', environment: '正式', description: '经营层查看账号。' }],
-  5: [{ id: 6, addressId: 8, name: '监控查看账号', username: 'ops_viewer', passwordMasked: '************', environment: '正式', description: '查看服务状态与告警。' }],
+  2: [{ id: 3, addressId: 3, name: '客户演示账号', username: 'delivery_demo', password: 'DeliveryDemo2026', passwordMasked: '************', environment: '演示', description: '客户验收演示账号。' }],
+  3: [{ id: 4, addressId: 5, name: '测试账号', username: 'prototype_demo', password: 'PrototypeDemo2026', passwordMasked: '************', environment: '测试', description: '供产品经理体验 AI 原型生成。' }],
+  4: [{ id: 5, addressId: 7, name: '经营查看账号', username: 'bi_viewer', password: 'BiViewer2026', passwordMasked: '************', environment: '正式', description: '经营层查看账号。' }],
+  5: [{ id: 6, addressId: 8, name: '监控查看账号', username: 'ops_viewer', password: 'OpsViewer2026', passwordMasked: '************', environment: '正式', description: '查看服务状态与告警。' }],
 }
 
 const credentialSecrets: Record<number, string> = {

@@ -1,54 +1,115 @@
 <template>
-  <section class="portal-shell">
+  <section class="portal-shell" id="overview">
     <div v-if="toastMessage" class="portal-toast">{{ toastMessage }}</div>
 
     <div class="portal-main">
       <section class="hero-band">
         <div class="hero-copy">
-          <div class="eyebrow-row">
-            <span class="eyebrow-dot"></span>
-            <span>公司一体化平台</span>
+          <div class="hero-kicker">
+            <span class="hero-kicker-dot"></span>
+            <span>OnePlatform / visual workspace</span>
           </div>
-          <h1>项目统一门户</h1>
-          <p>把项目地址、账号凭据、小程序入口和运行状态集中到一个清爽的内部工作台。</p>
+          <h1>把项目入口、账号和状态收进一张干净的桌面</h1>
+          <p>
+            统一查看系统地址、账号凭据、二维码入口和维护说明，减少来回切页与重复询问。
+          </p>
+
+          <div class="hero-actions">
+            <button type="button" class="primary-btn" @click="scrollToSection('projects')">
+              查看项目
+            </button>
+            <button type="button" class="secondary-btn" @click="loadProjects">刷新数据</button>
+          </div>
+
+          <div class="hero-metrics">
+            <article class="hero-metric metric-yellow">
+              <span>项目总数</span>
+              <strong>{{ store.projects.length }}</strong>
+              <small>当前可访问入口</small>
+            </article>
+            <article class="hero-metric metric-teal">
+              <span>可用项目</span>
+              <strong>{{ statusCounts['可用'] }}</strong>
+              <small>可直接进入</small>
+            </article>
+            <article class="hero-metric metric-rose">
+              <span>需要关注</span>
+              <strong>{{ attentionCount }}</strong>
+              <small>异常或维护中</small>
+            </article>
+          </div>
         </div>
 
-        <div class="hero-metrics">
-          <div class="metric-card">
-            <span>授权项目</span>
-            <strong>{{ store.projects.length }}</strong>
-            <small>当前可访问资源</small>
-          </div>
-          <div class="metric-card">
-            <span>运行可用</span>
-            <strong>{{ statusCounts['可用'] }}</strong>
-            <small>最近检测正常</small>
-          </div>
-          <div class="metric-card metric-card-warn">
-            <span>需关注</span>
-            <strong>{{ attentionCount }}</strong>
-            <small>异常或维护中</small>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="board-shell">
+            <div class="board-head">
+              <div>
+                <span class="board-label">Workspace board</span>
+                <strong>门户概览板</strong>
+              </div>
+              <span class="board-live"><i></i> Live</span>
+            </div>
+
+            <div class="board-grid">
+              <article class="board-card board-card-wide">
+                <span class="board-card-label">总入口</span>
+                <strong>{{ store.projects.length }}</strong>
+                <p>地址、账号、二维码和说明统一收纳。</p>
+              </article>
+
+              <article class="board-card board-card-yellow">
+                <span class="board-card-label">可用</span>
+                <strong>{{ statusCounts['可用'] }}</strong>
+                <p>当前可直接访问的项目。</p>
+              </article>
+
+              <article class="board-card board-card-coral">
+                <span class="board-card-label">关注</span>
+                <strong>{{ attentionCount }}</strong>
+                <p>异常或维护中的项目。</p>
+              </article>
+
+              <article class="board-card board-card-teal">
+                <span class="board-card-label">维护中</span>
+                <strong>{{ statusCounts['维护中'] }}</strong>
+                <p>需要后续跟进的资源。</p>
+              </article>
+
+              <div class="board-preview">
+                <img :src="heroImage" alt="" />
+                <span>AI 原型视觉占位</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="filter-panel">
-        <div class="search-control">
+      <section class="filter-panel" id="filters">
+        <label class="search-control">
           <ElIcon><Search /></ElIcon>
           <input
             v-model="store.filters.keyword"
-            placeholder="搜索项目名称、简称、标签或说明"
+            placeholder="搜索项目名、简称、标签或说明"
             @keyup.enter="loadProjects"
           />
-        </div>
-        <select v-model="store.filters.category" class="filter-select">
-          <option value="">全部分类</option>
-          <option v-for="item in categoryOptions" :key="item" :value="item">{{ item }}</option>
-        </select>
-        <select v-model="store.filters.status" class="filter-select">
-          <option value="">全部状态</option>
-          <option v-for="item in statusOptions" :key="item" :value="item">{{ item }}</option>
-        </select>
+        </label>
+
+        <label class="filter-select">
+          <span>项目分类</span>
+          <select v-model="store.filters.category">
+            <option value="">全部分类</option>
+            <option v-for="item in categoryOptions" :key="item" :value="item">{{ item }}</option>
+          </select>
+        </label>
+
+        <label class="filter-select">
+          <span>运行状态</span>
+          <select v-model="store.filters.status">
+            <option value="">全部状态</option>
+            <option v-for="item in statusOptions" :key="item" :value="item">{{ item }}</option>
+          </select>
+        </label>
+
         <button type="button" class="primary-btn" @click="loadProjects">
           <ElIcon><Search /></ElIcon>
           查询
@@ -59,12 +120,12 @@
         </button>
       </section>
 
-      <div class="overview-strip">
+      <div class="overview-strip" id="status">
         <button
           v-for="item in statusSummary"
           :key="item.status"
           class="status-summary"
-          :class="[statusClass(item.status), { active: store.filters.status === item.status }]"
+          :class="[statusToneClass(item.status), { active: store.filters.status === item.status }]"
           type="button"
           @click="setStatusFilter(item.status)"
         >
@@ -76,16 +137,18 @@
         </button>
       </div>
 
-      <div class="content-grid">
+      <div class="content-grid" id="projects">
         <main class="project-zone">
-          <div v-if="store.loading" class="state-box">加载中...</div>
-          <div v-else-if="store.projects.length === 0" class="state-box">暂无可访问项目，请联系管理员授权</div>
+          <div v-if="store.loading" class="state-box">正在加载项目...</div>
+          <div v-else-if="store.projects.length === 0" class="state-box">
+            暂无可访问项目，请联系管理员授权
+          </div>
           <div v-else class="project-grid">
             <article
-              v-for="project in store.projects"
+              v-for="(project, index) in store.projects"
               :key="project.id"
               class="project-card"
-              :class="{ attention: project.status !== '可用' }"
+              :class="[projectToneClass(index), { attention: project.status !== '可用' }]"
             >
               <div class="card-top">
                 <div class="logo-wrap">
@@ -99,7 +162,7 @@
                   <h2>{{ project.name }}</h2>
                   <span>{{ project.shortName }}</span>
                 </div>
-                <span :class="['status-pill', statusClass(project.status)]">
+                <span :class="['status-pill', statusToneClass(project.status)]">
                   <i class="status-dot"></i>
                   {{ project.status }}
                 </span>
@@ -123,10 +186,11 @@
   </section>
 
   <div v-if="detailVisible" class="modal-mask" @click.self="closeDetail">
-    <section class="detail-modal">
-      <button type="button" class="modal-close-btn" aria-label="Close detail" @click="closeDetail">
+    <section class="detail-modal" id="detail">
+      <button type="button" class="modal-close-btn" aria-label="关闭详情" @click="closeDetail">
         <ElIcon><Close /></ElIcon>
       </button>
+
       <aside class="detail-aside">
         <div class="detail-logo-wrap">
           <img :src="detail?.project.logo" :alt="detail?.project.name" />
@@ -134,15 +198,23 @@
         <h2>{{ detail?.project.name }}</h2>
         <p>{{ detail?.project.description }}</p>
         <div v-if="detail" class="detail-status-card">
-          <span :class="['status-pill', statusClass(detail.project.status)]">{{ detail.project.status }}</span>
+          <span :class="['status-pill', statusToneClass(detail.project.status)]">
+            {{ detail.project.status }}
+          </span>
           <strong>{{ detail.project.responseTime ? `${detail.project.responseTime}ms` : '未检测' }}</strong>
-          <small>{{ detail.project.lastCheckTime || '暂无检测时间' }}</small>
+          <small>{{ detail.project.lastCheckTime || '暂无巡检时间' }}</small>
         </div>
       </aside>
 
       <div class="detail-content">
         <nav class="detail-tabs">
-          <button v-for="tab in tabs" :key="tab.key" type="button" :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
+          <button
+            v-for="tab in tabs"
+            :key="tab.key"
+            type="button"
+            :class="{ active: activeTab === tab.key }"
+            @click="activeTab = tab.key"
+          >
             <ElIcon>
               <component :is="tab.icon" />
             </ElIcon>
@@ -150,7 +222,7 @@
           </button>
         </nav>
 
-        <div v-if="store.detailLoading" class="modal-state">加载中...</div>
+        <div v-if="store.detailLoading" class="modal-state">正在加载...</div>
         <div v-else-if="detail" class="detail-body">
           <section v-if="activeTab === 'basic'" class="detail-section">
             <dl class="info-list">
@@ -158,7 +230,7 @@
               <div><dt>项目标签</dt><dd>{{ detail.project.tags.join('、') }}</dd></div>
               <div><dt>维护人</dt><dd>{{ detail.project.maintainer }}</dd></div>
               <div><dt>响应耗时</dt><dd>{{ detail.project.responseTime ? `${detail.project.responseTime}ms` : '未检测' }}</dd></div>
-              <div><dt>最近检测</dt><dd>{{ detail.project.lastCheckTime || '暂无检测时间' }}</dd></div>
+              <div><dt>最近巡检</dt><dd>{{ detail.project.lastCheckTime || '暂无巡检时间' }}</dd></div>
               <div><dt>异常原因</dt><dd>{{ detail.project.abnormalReason || '-' }}</dd></div>
             </dl>
           </section>
@@ -169,7 +241,7 @@
                 <strong>访问入口</strong>
                 <span>{{ projectEntries.length }} 个入口</span>
               </div>
-              <div v-if="projectEntries.length === 0" class="modal-state">暂未配置访问入口</div>
+              <div v-if="projectEntries.length === 0" class="modal-state">暂无可配置入口</div>
               <div v-else class="entry-table">
                 <div
                   v-for="entry in projectEntries"
@@ -258,6 +330,7 @@ import {
   Search,
   View,
 } from '@element-plus/icons-vue'
+import heroImage from '@/assets/hero.png'
 import { usePortalStore } from '@/stores/portal'
 import type { ProjectAddress, ProjectCategory, ProjectCredential, ProjectStatus } from '@/types/project'
 
@@ -293,12 +366,13 @@ let toastTimer: number | undefined
 let passwordLoadToken = 0
 
 const categoryOptions: ProjectCategory[] = ['内部系统', '客户项目', 'AI工具', '数据平台', '运维服务', '小程序']
-const statusOptions: ProjectStatus[] = ['可用', '异常', '维护中', '未检测']
+const statusOptions: ProjectStatus[] = ['可用', '异常', '维护中', '未检查']
 const tabs = [
   { key: 'entry', label: '访问入口', icon: Link },
-  { key: 'basic', label: '基本信息', icon: Monitor },
-  { key: 'instruction', label: '访问说明', icon: Reading },
+  { key: 'basic', label: '基础信息', icon: Monitor },
+  { key: 'instruction', label: '使用说明', icon: Reading },
 ]
+const projectTones = ['white', 'yellow', 'rose', 'teal', 'coral'] as const
 
 const detail = computed(() => store.detail)
 const projectEntries = computed<ProjectEntry[]>(() => {
@@ -357,12 +431,16 @@ const statusCounts = computed<Record<ProjectStatus, number>>(() => {
 const statusSummary = computed(() => statusOptions.map((status) => ({ status, count: statusCounts.value[status] || 0 })))
 const attentionCount = computed(() => statusCounts.value['异常'] + statusCounts.value['维护中'])
 
-function statusClass(status: ProjectStatus) {
+function projectToneClass(index: number) {
+  return `tone-${projectTones[index % projectTones.length]}`
+}
+
+function statusToneClass(status: ProjectStatus) {
   return {
     available: status === '可用',
     error: status === '异常',
     maintenance: status === '维护中',
-    unchecked: status === '未检测',
+    unchecked: status === '未检查',
   }
 }
 
@@ -396,7 +474,7 @@ function keywordsForAddress(address: ProjectAddress) {
   if (source.includes('正式')) keywords.push('正式')
   if (source.includes('测试')) keywords.push('测试')
   if (source.includes('演示')) keywords.push('演示')
-  if (source.includes('后台')) keywords.push('后台', '管理')
+  if (source.includes('后台') || source.includes('管理')) keywords.push('后台', '管理')
   if (source.includes('文档')) keywords.push('文档')
   return keywords
 }
@@ -424,6 +502,10 @@ function setStatusFilter(status: ProjectStatus) {
 function resetFilters() {
   store.filters = { keyword: '', category: '', status: '' }
   loadProjects()
+}
+
+function scrollToSection(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 async function openProject(projectId: number) {
@@ -490,93 +572,74 @@ onMounted(loadProjects)
 .portal-shell {
   min-height: 100vh;
   position: relative;
-  padding: 88px 24px 42px;
-  color: #172033;
-  background:
-    linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px),
-    linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
-    #f3f6f8;
-  background-size: 28px 28px;
-}
-
-.portal-shell::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.28));
-}
-
-.portal-toast {
-  position: fixed;
-  top: 80px;
-  left: 50%;
-  z-index: 90;
-  transform: translateX(-50%);
-  padding: 11px 16px;
-  border: 1px solid rgba(12, 19, 33, 0.12);
-  border-radius: 8px;
-  color: #fff;
-  background: rgba(12, 19, 33, 0.94);
-  box-shadow: 0 18px 36px rgba(12, 19, 33, 0.18);
-  font-size: 13px;
-  line-height: 1;
+  padding: 96px 24px 42px;
+  color: var(--portal-ink);
 }
 
 .portal-main {
   position: relative;
   z-index: 1;
-  width: 100%;
+  width: min(1280px, 100%);
+  margin: 0 auto;
+}
+
+.portal-toast {
+  position: fixed;
+  top: 82px;
+  left: 50%;
+  z-index: 90;
+  transform: translateX(-50%);
+  padding: 11px 16px;
+  border: 1px solid rgba(28, 28, 30, 0.08);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(28, 28, 30, 0.96);
+  box-shadow: rgba(5, 0, 56, 0.18) 0 18px 36px -8px;
+  font-size: 13px;
+  line-height: 1;
 }
 
 .hero-band {
-  min-height: 232px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 430px;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  gap: 28px;
   align-items: center;
-  padding: 30px 28px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
-  color: #fff;
-  background:
-    linear-gradient(135deg, rgba(9, 20, 36, 0.98), rgba(18, 48, 74, 0.96)),
-    #101d2d;
-  box-shadow: 0 24px 54px rgba(15, 23, 42, 0.18);
-  overflow: hidden;
+  padding: 0 0 28px;
 }
 
 .hero-copy {
-  align-self: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 720px;
+  gap: 18px;
 }
 
-.eyebrow-row {
+.hero-kicker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   width: fit-content;
-  padding: 7px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 7px 12px;
+  border: 1px solid rgba(224, 226, 232, 0.9);
   border-radius: 999px;
-  color: #b9d5ff;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--portal-muted);
+  background: rgba(255, 255, 255, 0.84);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.eyebrow-dot {
+.hero-kicker-dot {
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: #35d5a5;
-  box-shadow: 0 0 0 4px rgba(53, 213, 165, 0.16);
+  background: var(--portal-yellow);
+  box-shadow: 0 0 0 4px rgba(255, 208, 47, 0.18);
 }
 
 .hero-copy h1,
+.hero-copy p,
+.board-head strong,
+.board-card strong,
 .detail-aside h2,
 .project-card h2,
 .hero-copy p {
@@ -584,171 +647,335 @@ onMounted(loadProjects)
 }
 
 .hero-copy h1 {
-  margin-top: 18px;
-  color: #fff;
-  font-size: 38px;
-  line-height: 1.18;
-  font-weight: 800;
+  max-width: 760px;
+  color: var(--portal-ink);
+  font-family: var(--portal-font-display);
+  font-size: clamp(40px, 5vw, 60px);
+  line-height: 1.08;
+  font-weight: 700;
 }
 
 .hero-copy p {
-  max-width: 580px;
-  margin-top: 14px;
-  color: rgba(232, 240, 250, 0.78);
-  font-size: 15px;
-  line-height: 1.8;
+  max-width: 640px;
+  color: var(--portal-muted);
+  font-size: 16px;
+  line-height: 1.7;
 }
 
-.hero-metrics {
-  align-self: center;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.metric-card {
-  min-height: 132px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-  padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.09);
-}
-
-.metric-card span {
-  color: rgba(232, 240, 250, 0.76);
-  font-size: 13px;
-}
-
-.metric-card small {
-  color: rgba(232, 240, 250, 0.58);
-  font-size: 12px;
-}
-
-.metric-card strong {
-  color: #fff;
-  font-size: 34px;
-  line-height: 1;
-}
-
-.metric-card-warn strong {
-  color: #ffd36b;
-}
-
-.filter-panel {
+.hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  align-items: center;
-  width: 100%;
-  margin-top: -26px;
-  padding: 14px;
-  border: 1px solid rgba(217, 225, 235, 0.9);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.09);
-  backdrop-filter: blur(16px);
-}
-
-.search-control,
-.filter-select {
-  height: 42px;
-  border: 1px solid #dbe3ed;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.search-control {
-  width: auto;
-  flex: 1 1 320px;
-  min-width: 280px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 0 13px;
-  color: #5d6b82;
-}
-
-.search-control input,
-.filter-select {
-  width: 100%;
-  border: 0;
-  outline: 0;
-  color: #172033;
-  font-size: 14px;
-}
-
-.search-control input::placeholder {
-  color: #8a96a8;
-}
-
-.filter-select {
-  width: 150px;
-  flex: 0 0 150px;
-  padding: 0 12px;
-}
-
-button {
-  border: 0;
-  cursor: pointer;
-  font: inherit;
 }
 
 .primary-btn,
+.secondary-btn,
 .ghost-btn,
 .detail-btn,
 .resource-actions button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  height: 42px;
-  padding: 0 16px;
-  border-radius: 8px;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 700;
   transition:
     transform 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
     box-shadow 0.18s ease,
-    background 0.18s ease;
+    border-color 0.18s ease;
 }
 
-.primary-btn,
-.ghost-btn {
-  flex: 0 0 auto;
-  min-width: 82px;
-  white-space: nowrap;
-}
-
-.primary-btn,
-.detail-btn {
+.primary-btn {
   color: #fff;
-  background: #1e63d6;
-  box-shadow: 0 12px 24px rgba(30, 99, 214, 0.22);
+  background: var(--portal-ink);
+  box-shadow: rgba(5, 0, 56, 0.14) 0 14px 24px -10px;
 }
 
+.primary-btn:hover {
+  transform: translateY(-1px);
+  background: #2c2c34;
+}
+
+.secondary-btn,
 .ghost-btn,
 .resource-actions button {
-  color: #243149;
-  background: #eef3f8;
+  color: var(--portal-ink);
+  background: #fff;
+  border: 1px solid var(--portal-border-strong);
 }
 
-.primary-btn:hover,
-.detail-btn:hover,
+.secondary-btn:hover,
 .ghost-btn:hover,
 .resource-actions button:hover {
   transform: translateY(-1px);
+  background: #f7f8fa;
+}
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.hero-metric {
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid rgba(224, 226, 232, 0.9);
+  border-radius: 24px;
+  box-shadow: var(--portal-shadow-soft);
+}
+
+.hero-metric span {
+  color: var(--portal-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hero-metric strong {
+  color: var(--portal-ink);
+  font-family: var(--portal-font-display);
+  font-size: 38px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.hero-metric small {
+  color: var(--portal-subtle);
+  font-size: 12px;
+}
+
+.metric-yellow {
+  background: var(--portal-yellow-soft);
+}
+
+.metric-teal {
+  background: var(--portal-teal);
+}
+
+.metric-rose {
+  background: var(--portal-rose);
+}
+
+.hero-visual {
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.board-shell {
+  width: min(100%, 540px);
+  padding: 18px;
+  border: 1px solid rgba(224, 226, 232, 0.92);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--portal-shadow-mockup);
+}
+
+.board-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.board-label {
+  display: block;
+  color: var(--portal-subtle);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.board-head strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--portal-ink);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.board-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: #187574;
+  background: var(--portal-teal);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.board-live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #0fbcb0;
+  box-shadow: 0 0 0 4px rgba(15, 188, 176, 0.18);
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.board-card,
+.board-preview {
+  min-height: 132px;
+  padding: 16px;
+  border: 1px solid rgba(224, 226, 232, 0.95);
+  border-radius: 22px;
+  background: #fff;
+}
+
+.board-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.board-card-wide {
+  grid-column: 1 / -1;
+  min-height: 150px;
+}
+
+.board-card-label {
+  color: var(--portal-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.board-card strong {
+  color: var(--portal-ink);
+  font-family: var(--portal-font-display);
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.board-card p {
+  color: var(--portal-subtle);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.board-card-yellow {
+  background: var(--portal-yellow-soft);
+}
+
+.board-card-coral {
+  background: #ffc6c6;
+}
+
+.board-card-teal {
+  background: var(--portal-teal);
+}
+
+.board-preview {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 164px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(250, 250, 247, 0.92));
+}
+
+.board-preview img {
+  width: 100%;
+  height: 124px;
+  object-fit: contain;
+}
+
+.board-preview span {
+  color: var(--portal-subtle);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.filter-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(160px, 0.8fr)) auto auto;
+  gap: 12px;
+  align-items: end;
+  margin-top: 28px;
+  padding: 16px;
+  border: 1px solid rgba(224, 226, 232, 0.95);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--portal-shadow-card);
+  backdrop-filter: blur(16px);
+}
+
+.search-control,
+.filter-select {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.search-control {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.search-control input,
+.filter-select select {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: var(--portal-ink);
+  background: transparent;
+  font: inherit;
+}
+
+.search-control input::placeholder {
+  color: var(--portal-subtle);
+}
+
+.search-control :deep(svg) {
+  color: var(--portal-muted);
+}
+
+.filter-select span {
+  padding-left: 4px;
+  color: var(--portal-subtle);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.filter-select select {
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 999px;
+  background: #fff;
 }
 
 .overview-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  width: fit-content;
-  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
   margin-top: 14px;
 }
 
@@ -756,39 +983,58 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: clamp(176px, 12vw, 220px);
-  height: 48px;
-  padding: 0 14px;
-  border: 1px solid #dde6ef;
-  border-radius: 8px;
-  color: #172033;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
-  transition:
-    transform 0.18s ease,
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background 0.18s ease;
-}
-
-.status-summary:hover,
-.status-summary.active {
-  transform: translateY(-1px);
-  border-color: rgba(30, 99, 214, 0.35);
-  background: #fff;
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.09);
+  gap: 12px;
+  width: 100%;
+  min-height: 72px;
+  padding: 0 16px;
+  border: 1px solid rgba(224, 226, 232, 0.95);
+  border-radius: 24px;
+  color: var(--portal-ink);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--portal-shadow-soft);
 }
 
 .status-summary span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  color: var(--portal-muted);
   font-size: 13px;
-  color: #68758a;
+  font-weight: 700;
 }
 
 .status-summary strong {
-  font-size: 20px;
+  color: var(--portal-ink);
+  font-family: var(--portal-font-display);
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.status-summary.available {
+  background: var(--portal-teal);
+}
+
+.status-summary.error {
+  background: #ffd7d2;
+}
+
+.status-summary.maintenance {
+  background: var(--portal-yellow-soft);
+}
+
+.status-summary.unchecked {
+  background: #f0f1f5;
+}
+
+.status-summary.active {
+  border-color: var(--portal-ink);
+  background: var(--portal-ink);
+}
+
+.status-summary.active span,
+.status-summary.active strong {
+  color: #fff;
 }
 
 .summary-dot,
@@ -820,36 +1066,78 @@ button {
 }
 
 .project-card {
-  border: 1px solid #dde6ef;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06);
-}
-
-.project-card {
+  position: relative;
   display: flex;
-  min-height: 268px;
+  min-height: 276px;
   flex-direction: column;
-  padding: 14px;
+  padding: 16px;
+  border: 1px solid rgba(224, 226, 232, 0.95);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: var(--portal-shadow-card);
   transition:
     transform 0.18s ease,
     border-color 0.18s ease,
     box-shadow 0.18s ease;
 }
 
+.project-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  border-radius: 24px 24px 0 0;
+  background: var(--portal-border);
+}
+
 .project-card:hover {
   transform: translateY(-3px);
-  border-color: #b9c9da;
-  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.11);
+  border-color: rgba(28, 28, 30, 0.18);
+  box-shadow: rgba(5, 0, 56, 0.1) 0 18px 32px -12px;
 }
 
 .project-card.attention {
-  border-color: #f4d8a0;
-  box-shadow: 0 16px 34px rgba(161, 92, 5, 0.08);
+  border-color: rgba(255, 122, 122, 0.3);
 }
 
 .project-card.attention:hover {
-  border-color: #e8be65;
+  border-color: rgba(255, 122, 122, 0.48);
+}
+
+.tone-white::before {
+  background: var(--portal-border);
+}
+
+.tone-yellow {
+  background: linear-gradient(180deg, rgba(255, 244, 196, 0.8), rgba(255, 255, 255, 0.92));
+}
+
+.tone-yellow::before {
+  background: var(--portal-yellow);
+}
+
+.tone-rose {
+  background: linear-gradient(180deg, rgba(253, 224, 240, 0.82), rgba(255, 255, 255, 0.92));
+}
+
+.tone-rose::before {
+  background: #f4a7d5;
+}
+
+.tone-teal {
+  background: linear-gradient(180deg, rgba(195, 250, 245, 0.82), rgba(255, 255, 255, 0.92));
+}
+
+.tone-teal::before {
+  background: #0fbcb0;
+}
+
+.tone-coral {
+  background: linear-gradient(180deg, rgba(255, 230, 205, 0.82), rgba(255, 255, 255, 0.92));
+}
+
+.tone-coral::before {
+  background: #ff9999;
 }
 
 .card-top,
@@ -865,32 +1153,22 @@ button {
 .detail-logo-wrap {
   display: grid;
   place-items: center;
-  border-radius: 8px;
-  background: #edf3f8;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
 }
 
 .logo-wrap {
-  width: 50px;
-  height: 50px;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(224, 226, 232, 0.92);
 }
 
 .project-logo,
 .detail-logo-wrap img {
   width: 42px;
   height: 42px;
-  border-radius: 8px;
+  border-radius: 12px;
   object-fit: cover;
-}
-
-.modal-close-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  color: #5d6b82;
-  background: #eef3f8;
 }
 
 .card-title-line {
@@ -900,10 +1178,10 @@ button {
 }
 
 .card-title-line h2 {
-  color: #142033;
-  font-size: 16px;
+  color: var(--portal-ink);
+  font-size: 17px;
   line-height: 1.35;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .card-title-line div > span,
@@ -915,7 +1193,7 @@ button {
 .detail-aside p,
 .detail-status-card small,
 .section-heading span {
-  color: #68758a;
+  color: var(--portal-muted);
   font-size: 13px;
 }
 
@@ -924,7 +1202,7 @@ button {
   display: -webkit-box;
   margin-top: 10px;
   overflow: hidden;
-  line-height: 1.55;
+  line-height: 1.65;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -943,9 +1221,9 @@ button {
   display: inline-flex;
   align-items: center;
   width: fit-content;
-  min-height: 23px;
+  min-height: 24px;
   border-radius: 999px;
-  padding: 3px 8px;
+  padding: 3px 10px;
   font-size: 12px;
   font-weight: 700;
 }
@@ -965,7 +1243,7 @@ button {
 }
 
 .available {
-  color: #0b7a55;
+  color: #187574;
 }
 
 .error {
@@ -998,8 +1276,13 @@ button {
 
 .detail-btn {
   width: 100%;
-  height: 38px;
   margin-top: auto;
+  background: var(--portal-ink);
+  color: #fff;
+}
+
+.detail-btn:hover {
+  background: #2c2c34;
 }
 
 .state-box,
@@ -1009,9 +1292,9 @@ button {
 }
 
 .state-box {
-  border: 1px solid #dde6ef;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(224, 226, 232, 0.95);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.84);
 }
 
 .modal-mask {
@@ -1022,58 +1305,65 @@ button {
   align-items: center;
   justify-content: center;
   padding: 24px 20px;
-  background: rgba(12, 19, 33, 0.58);
+  background: rgba(12, 19, 33, 0.52);
   backdrop-filter: blur(10px);
 }
 
 .detail-modal {
   position: relative;
-  width: min(1080px, calc(100vw - 48px));
-  height: min(560px, calc(100vh - 48px));
+  width: min(1120px, calc(100vw - 48px));
+  height: min(620px, calc(100vh - 48px));
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 28px 68px rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(224, 226, 232, 0.95);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: rgba(5, 0, 56, 0.22) 0 24px 64px -18px;
 }
 
 .detail-aside {
   position: relative;
-  padding: 26px;
-  color: #fff;
+  padding: 28px;
+  color: var(--portal-ink);
   background:
-    linear-gradient(160deg, rgba(14, 31, 51, 0.98), rgba(24, 67, 86, 0.95)),
-    #102033;
+    linear-gradient(180deg, rgba(255, 244, 196, 0.86), rgba(255, 255, 255, 0.96)),
+    #fff;
 }
 
 .modal-close-btn {
   position: absolute;
   top: 16px;
-  right: 18px;
+  right: 16px;
   z-index: 3;
-  color: #526078;
-  background: #eef3f8;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--portal-muted);
+  background: #fff;
+  box-shadow: var(--portal-shadow-soft);
 }
 
 .detail-logo-wrap {
-  width: 76px;
-  height: 76px;
-  margin-top: 22px;
-  background: rgba(255, 255, 255, 0.14);
+  width: 78px;
+  height: 78px;
+  margin-top: 24px;
+  background: rgba(255, 255, 255, 0.88);
 }
 
 .detail-aside h2 {
   margin-top: 18px;
+  font-family: var(--portal-font-display);
   font-size: 22px;
-  line-height: 1.35;
+  line-height: 1.25;
+  font-weight: 700;
 }
 
 .detail-aside p {
   margin-top: 10px;
-  color: rgba(232, 240, 250, 0.72);
+  color: var(--portal-muted);
   line-height: 1.75;
 }
 
@@ -1082,17 +1372,16 @@ button {
   gap: 10px;
   margin-top: 24px;
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(224, 226, 232, 0.95);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.84);
 }
 
 .detail-status-card strong {
-  font-size: 24px;
-}
-
-.detail-status-card small {
-  color: rgba(232, 240, 250, 0.66);
+  font-family: var(--portal-font-display);
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 700;
 }
 
 .detail-content {
@@ -1100,7 +1389,7 @@ button {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: #f7f9fb;
+  background: #fff;
 }
 
 .detail-tabs {
@@ -1108,8 +1397,8 @@ button {
   flex-wrap: wrap;
   gap: 8px;
   padding: 16px 76px 16px 18px;
-  border-bottom: 1px solid #dfe7ef;
-  background: #fff;
+  border-bottom: 1px solid var(--portal-border);
+  background: rgba(250, 250, 247, 0.82);
 }
 
 .detail-tabs button {
@@ -1118,14 +1407,16 @@ button {
   gap: 7px;
   height: 38px;
   padding: 0 12px;
-  border-radius: 8px;
-  color: #526078;
-  background: #eef3f8;
+  border-radius: 999px;
+  color: var(--portal-muted);
+  background: #fff;
+  border: 1px solid var(--portal-border-strong);
 }
 
 .detail-tabs button.active {
   color: #fff;
-  background: #1e63d6;
+  background: var(--portal-ink);
+  border-color: var(--portal-ink);
 }
 
 .detail-body {
@@ -1134,10 +1425,6 @@ button {
   overflow: auto;
   overflow-x: hidden;
   padding: 18px;
-}
-
-.detail-section {
-  min-height: auto;
 }
 
 .info-list {
@@ -1149,8 +1436,8 @@ button {
 
 .info-list div,
 .resource-row {
-  border: 1px solid #dde6ef;
-  border-radius: 8px;
+  border: 1px solid var(--portal-border);
+  border-radius: 20px;
   background: #fff;
 }
 
@@ -1161,7 +1448,7 @@ button {
 
 .info-list dd {
   margin: 8px 0 0;
-  color: #172033;
+  color: var(--portal-ink);
   line-height: 1.7;
 }
 
@@ -1252,7 +1539,7 @@ button {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
-  color: #8a96a8;
+  color: var(--portal-subtle);
   font-size: 13px;
 }
 
@@ -1311,15 +1598,16 @@ button {
 .credential-actions button,
 .entry-actions button {
   height: 32px;
-  padding: 0 9px;
+  padding: 0 10px;
   font-size: 12px;
+  box-shadow: none;
 }
 
 .entry-qrcode-thumb {
   width: 54px;
   height: 54px;
-  border: 1px solid #dde6ef;
-  border-radius: 8px;
+  border: 1px solid var(--portal-border);
+  border-radius: 12px;
   object-fit: cover;
 }
 
@@ -1328,7 +1616,7 @@ button {
 }
 
 .section-heading strong {
-  color: #172033;
+  color: var(--portal-ink);
   font-size: 16px;
 }
 
@@ -1344,7 +1632,7 @@ button {
 }
 
 .resource-row strong {
-  color: #172033;
+  color: var(--portal-ink);
 }
 
 .resource-row span,
@@ -1360,70 +1648,60 @@ button {
 }
 
 .resource-actions button {
-  height: 34px;
-  padding: 0 10px;
-  box-shadow: none;
+  background: #fff;
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1120px) {
   .hero-band {
     grid-template-columns: 1fr;
   }
 
-  .hero-metrics {
-    align-self: stretch;
+  .hero-visual {
+    justify-content: flex-start;
+  }
+
+  .board-shell {
+    width: 100%;
   }
 
   .filter-panel {
-    width: 100%;
-  }
-
-  .search-control {
-    width: 100%;
-    flex: 1 1 100%;
-  }
-
-  .filter-select {
-    flex: 1 1 180px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .overview-strip {
-    width: 100%;
-  }
-
-  .status-summary {
-    flex: 1 1 180px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 760px) {
   .portal-shell {
-    padding: 78px 14px 28px;
+    padding: 82px 14px 28px;
   }
 
   .hero-band {
-    padding: 22px;
+    gap: 22px;
+    padding-bottom: 20px;
   }
 
   .hero-copy h1 {
-    font-size: 30px;
+    font-size: 34px;
   }
 
   .hero-metrics,
+  .filter-panel,
+  .overview-strip,
   .info-list {
     grid-template-columns: 1fr;
   }
 
-  .filter-panel,
-  .overview-strip {
-    width: 100%;
+  .filter-panel {
+    padding: 14px;
   }
 
-  .filter-select,
   .primary-btn,
+  .secondary-btn,
   .ghost-btn,
   .status-summary {
-    flex: 1 1 100%;
     width: 100%;
   }
 

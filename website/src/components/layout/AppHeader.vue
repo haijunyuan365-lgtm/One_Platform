@@ -11,6 +11,12 @@
         </span>
       </RouterLink>
 
+      <nav class="nav-links" aria-label="Portal navigation">
+        <button type="button" @click="scrollToSection('overview')">概览</button>
+        <button type="button" @click="scrollToSection('projects')">项目</button>
+        <button type="button" @click="scrollToSection('status')">状态</button>
+      </nav>
+
       <div class="header-spacer"></div>
 
       <div class="platform-state">
@@ -121,6 +127,10 @@ async function handleLogout() {
   userMenuOpen.value = false
 }
 
+function scrollToSection(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 onMounted(() => document.addEventListener('click', onClickOutside))
 onUnmounted(() => document.removeEventListener('click', onClickOutside))
 </script>
@@ -132,8 +142,8 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
   left: 0;
   right: 0;
   z-index: 50;
-  border-bottom: 1px solid transparent;
-  background: rgba(244, 247, 250, 0.76);
+  border-bottom: 1px solid rgba(224, 226, 232, 0.5);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(18px);
   transition:
     border-color 0.2s ease,
@@ -142,18 +152,18 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 }
 
 .app-header.scrolled {
-  border-color: rgba(203, 213, 225, 0.86);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  border-color: rgba(199, 202, 213, 0.78);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: rgba(5, 0, 56, 0.08) 0 12px 32px -8px;
 }
 
 .header-inner {
-  width: 100%;
-  height: 70px;
+  width: min(1280px, calc(100% - 48px));
+  height: 72px;
   display: flex;
   align-items: center;
   gap: 22px;
-  padding: 0 24px;
+  margin: 0 auto;
 }
 
 .brand-link,
@@ -167,23 +177,23 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 .brand-link {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
-  min-width: 224px;
-  color: #142033;
+  gap: 12px;
+  min-width: 236px;
+  color: var(--portal-ink);
 }
 
 .brand-mark {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(18, 66, 118, 0.16);
-  border-radius: 8px;
-  color: #fff;
-  background:
-    linear-gradient(145deg, #133858, #1e63d6 62%, #2bb18a),
-    #1e63d6;
-  box-shadow: 0 12px 24px rgba(30, 99, 214, 0.2);
+  border: 1px solid rgba(28, 28, 30, 0.08);
+  border-radius: 12px;
+  color: #1c1c1e;
+  background: var(--portal-yellow);
+  box-shadow:
+    rgba(252, 185, 0, 0.28) 0 12px 24px -10px,
+    rgba(255, 255, 255, 0.55) 0 1px 0 inset;
 }
 
 .brand-copy {
@@ -192,17 +202,46 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 }
 
 .brand-copy strong {
-  color: #142033;
-  font-size: 15px;
+  color: var(--portal-ink);
+  font-family: var(--portal-font-display);
+  font-size: 16px;
   line-height: 1.2;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .brand-copy small,
 .user-meta small,
 .dropdown-profile small {
-  color: #718096;
+  color: var(--portal-subtle);
   font-size: 12px;
+}
+
+.nav-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid rgba(224, 226, 232, 0.82);
+  border-radius: 999px;
+  background: rgba(247, 248, 250, 0.78);
+}
+
+.nav-links button {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: var(--portal-muted);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.nav-links button:first-child {
+  color: #fff;
+  background: var(--portal-ink);
 }
 
 .header-spacer {
@@ -217,25 +256,26 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 }
 
 .platform-state {
-  height: 32px;
+  height: 34px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 0 10px;
-  border: 1px solid rgba(43, 177, 138, 0.22);
-  border-radius: 8px;
-  color: #0b7a55;
-  background: rgba(228, 248, 239, 0.72);
+  padding: 0 12px;
+  border: 1px solid rgba(15, 188, 176, 0.2);
+  border-radius: 999px;
+  color: #187574;
+  background: #c3faf5;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .platform-state span {
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: #2bb18a;
-  box-shadow: 0 0 0 4px rgba(43, 177, 138, 0.16);
+  background: #0fbcb0;
+  box-shadow: 0 0 0 4px rgba(15, 188, 176, 0.18);
 }
 
 button {
@@ -247,39 +287,42 @@ button {
 .text-btn,
 .admin-btn,
 .user-trigger {
-  height: 40px;
-  border-radius: 8px;
+  height: 42px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 700;
 }
 
 .text-btn {
-  padding: 0 14px;
-  color: #526078;
+  padding: 0 16px;
+  color: var(--portal-muted);
   background: transparent;
 }
 
 .text-btn:hover {
-  color: #142033;
-  background: rgba(15, 23, 42, 0.06);
+  color: var(--portal-ink);
+  background: rgba(28, 28, 30, 0.06);
 }
 
 .admin-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 8px;
+  padding: 0 18px;
   color: #fff;
-  background: #1e63d6;
-  box-shadow: 0 12px 24px rgba(30, 99, 214, 0.2);
-}
-
-.admin-btn {
-  padding: 0 15px;
+  background: var(--portal-ink);
+  box-shadow: rgba(5, 0, 56, 0.14) 0 12px 24px -8px;
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .admin-btn:hover {
-  background: #174fba;
+  background: #2c2c34;
+  transform: translateY(-1px);
+  box-shadow: rgba(5, 0, 56, 0.2) 0 16px 28px -10px;
 }
 
 .user-menu {
@@ -290,21 +333,22 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  padding: 0 10px 0 6px;
-  color: #142033;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(203, 213, 225, 0.78);
+  padding: 0 12px 0 6px;
+  color: var(--portal-ink);
+  background: #fff;
+  border: 1px solid rgba(224, 226, 232, 0.95);
+  box-shadow: var(--portal-shadow-soft);
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   overflow: hidden;
-  border-radius: 8px;
-  color: #fff;
-  background: #17324d;
+  border-radius: 999px;
+  color: #1c1c1e;
+  background: var(--portal-yellow);
   font-size: 13px;
   font-weight: 800;
 }
@@ -316,8 +360,8 @@ button {
 }
 
 .avatar-large {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
 }
 
 .user-meta {
@@ -329,14 +373,14 @@ button {
 .user-meta strong {
   max-width: 96px;
   overflow: hidden;
-  color: #142033;
+  color: var(--portal-ink);
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .arrow-icon {
-  color: #718096;
+  color: var(--portal-subtle);
   transition: transform 0.18s ease;
 }
 
@@ -348,23 +392,20 @@ button {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  width: 240px;
+  width: 244px;
   padding: 8px;
-  border: 1px solid #dfe7ef;
-  border-radius: 8px;
+  border: 1px solid var(--portal-border);
+  border-radius: 20px;
   background: #fff;
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.16);
+  box-shadow: rgba(5, 0, 56, 0.12) 0 16px 48px -8px;
 }
 
 .dropdown-profile {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.dropdown-profile {
   padding: 10px;
-  border-bottom: 1px solid #edf1f5;
+  border-bottom: 1px solid var(--portal-border);
   margin-bottom: 6px;
 }
 
@@ -372,7 +413,7 @@ button {
   display: block;
   max-width: 152px;
   overflow: hidden;
-  color: #142033;
+  color: var(--portal-ink);
   font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -380,21 +421,21 @@ button {
 
 .dropdown-item {
   width: 100%;
-  height: 38px;
+  height: 40px;
   display: flex;
   align-items: center;
   gap: 9px;
   padding: 0 10px;
-  border-radius: 8px;
-  color: #526078;
+  border-radius: 12px;
+  color: var(--portal-muted);
   background: transparent;
   font-size: 14px;
   text-align: left;
 }
 
 .dropdown-item:hover {
-  color: #142033;
-  background: #f3f6f8;
+  color: var(--portal-ink);
+  background: #f7f8fa;
 }
 
 .dropdown-item.danger {
@@ -418,22 +459,36 @@ button {
   transform: translateY(-6px);
 }
 
-@media (max-width: 840px) {
+@media (max-width: 1040px) {
+  .header-inner {
+    width: calc(100% - 28px);
+  }
+
+  .nav-links {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
   .header-inner {
     height: 64px;
-    padding: 0 14px;
+    gap: 12px;
   }
 
   .brand-link {
     min-width: 0;
   }
 
-  .brand-copy small {
+  .brand-copy small,
+  .platform-state {
     display: none;
   }
 
-  .platform-state {
-    display: none;
+  .brand-copy strong {
+    max-width: 132px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .header-actions {
@@ -441,11 +496,11 @@ button {
   }
 
   .text-btn {
-    padding: 0 8px;
+    padding: 0 10px;
   }
 
   .admin-btn {
-    padding: 0 10px;
+    padding: 0 12px;
   }
 
   .user-meta {

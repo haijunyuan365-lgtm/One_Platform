@@ -1,5 +1,13 @@
-export type ProjectCategory = '内部系统' | '客户项目' | 'AI工具' | '数据平台' | '运维服务' | '小程序'
-export type ProjectStatus = '可用' | '异常' | '维护中' | '未检测'
+export type ProjectCategory =
+  | '内部系统'
+  | '客户项目'
+  | 'AI工具'
+  | '数据平台'
+  | '运维服务'
+  | '小程序'
+
+export type ProjectStatus = '可用' | '异常' | '维护中' | '未检查'
+
 export type CredentialEnv = '正式' | '测试' | '演示' | '其他'
 
 export interface ProjectCard {

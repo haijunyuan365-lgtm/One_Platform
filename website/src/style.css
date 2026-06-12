@@ -1,18 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  --el-color-primary: #1e63d6;
-  --el-color-primary-light-3: #4f86e6;
-  --el-color-primary-light-5: #8fb3ef;
-  --el-color-primary-light-7: #c6d8f7;
-  --el-color-primary-light-9: #edf4ff;
-  --el-border-radius-base: 8px;
-  --el-border-radius-small: 6px;
+  --el-color-primary: #1c1c1e;
+  --el-color-primary-light-3: #4a4a50;
+  --el-color-primary-light-5: #75757c;
+  --el-color-primary-light-7: #b0b0b6;
+  --el-color-primary-light-9: #f2f2f3;
+  --el-color-success: #0fbcb0;
+  --el-color-warning: #fcb900;
+  --el-color-danger: #ff7a7a;
+  --el-border-radius-base: 16px;
+  --el-border-radius-small: 8px;
   --el-font-size-base: 14px;
-  --portal-ink: #142033;
-  --portal-muted: #68758a;
-  --portal-border: #dfe7ef;
-  --portal-canvas: #f3f6f8;
+  --portal-font-display:
+    "Trebuchet MS",
+    "Segoe UI Variable Display",
+    "Segoe UI",
+    "PingFang SC",
+    "Microsoft YaHei",
+    sans-serif;
+  --portal-font-body:
+    "Segoe UI Variable",
+    "Segoe UI",
+    "PingFang SC",
+    "Microsoft YaHei",
+    sans-serif;
+  --portal-ink: #1c1c1e;
+  --portal-muted: #5e6470;
+  --portal-subtle: #8b909b;
+  --portal-border: #e5e7eb;
+  --portal-border-strong: #cfd4dd;
+  --portal-canvas: #fafaf7;
+  --portal-canvas-strong: #ffffff;
+  --portal-yellow: #ffd02f;
+  --portal-yellow-soft: #fff4c4;
+  --portal-yellow-deep: #fcb900;
+  --portal-blue: #4262ff;
+  --portal-coral: #ff9999;
+  --portal-rose: #fde0f0;
+  --portal-teal: #c3faf5;
+  --portal-orange: #ffe6cd;
+  --portal-shadow-soft: rgba(5, 0, 56, 0.04) 0px 1px 2px 0px;
+  --portal-shadow-card: rgba(5, 0, 56, 0.06) 0px 4px 12px 0px;
+  --portal-shadow-mockup: rgba(5, 0, 56, 0.08) 0px 12px 32px -4px;
 }
 
 html {
@@ -21,6 +51,7 @@ html {
   line-height: 1.5;
   overscroll-behavior: none;
   scrollbar-gutter: stable;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -31,17 +62,26 @@ body {
   overscroll-behavior: none;
   color: var(--portal-ink);
   background:
-    linear-gradient(180deg, #f8fafc 0%, var(--portal-canvas) 46%, #eef3f8 100%),
+    linear-gradient(180deg, #ffffff 0%, #fafaf7 55%, #f4f5ef 100%),
+    repeating-linear-gradient(0deg, rgba(28, 28, 30, 0.03) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(28, 28, 30, 0.03) 0 1px, transparent 1px 28px),
     var(--portal-canvas);
-  font-family:
-    "Microsoft YaHei",
-    "PingFang SC",
-    "Hiragino Sans GB",
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--portal-font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  color-scheme: light;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.14)),
+    radial-gradient(circle at top left, rgba(255, 208, 47, 0.08), transparent 42%),
+    radial-gradient(circle at top right, rgba(66, 98, 255, 0.05), transparent 34%);
 }
 
 *,
@@ -66,13 +106,27 @@ a {
   text-decoration: none;
 }
 
+img {
+  display: block;
+  max-width: 100%;
+}
+
 ::selection {
-  color: #fff;
-  background: #1e63d6;
+  color: #1c1c1e;
+  background: #ffd02f;
 }
 
 #app {
   height: 100%;
+  background: transparent;
+}
+
+.el-scrollbar {
+  background: transparent;
+}
+
+.el-scrollbar__wrap {
+  scroll-behavior: smooth;
 }
 
 .el-scrollbar__bar.is-horizontal,
@@ -81,5 +135,14 @@ a {
 }
 
 .el-scrollbar__thumb {
-  background-color: rgba(100, 116, 139, 0.38);
+  background-color: rgba(94, 100, 112, 0.36);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgba(66, 98, 255, 0.42);
+  outline-offset: 2px;
 }

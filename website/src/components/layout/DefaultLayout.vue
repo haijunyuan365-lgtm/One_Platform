@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-white">
+  <div class="layout-shell">
     <AppHeader />
-    <main class="flex-1">
+    <main class="layout-main">
       <RouterView v-slot="{ Component, route }">
         <Transition name="page" mode="out-in">
           <div :key="route.path">
@@ -18,6 +18,18 @@ import AppHeader from './AppHeader.vue'
 </script>
 
 <style scoped>
+.layout-shell {
+  min-height: calc(100vh - 16px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.layout-main {
+  flex: 1;
+  min-width: 0;
+}
+
 .page-enter-active {
   transition: opacity 0.2s ease, transform 0.2s ease;
 }

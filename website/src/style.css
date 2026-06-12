@@ -1,18 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --el-color-primary: #1e63d6;
-  --el-color-primary-light-3: #4f86e6;
-  --el-color-primary-light-5: #8fb3ef;
-  --el-color-primary-light-7: #c6d8f7;
-  --el-color-primary-light-9: #edf4ff;
-  --el-border-radius-base: 8px;
-  --el-border-radius-small: 6px;
+  --el-color-primary: #000000;
+  --el-color-primary-light-3: #3a3a3a;
+  --el-color-primary-light-5: #666666;
+  --el-color-primary-light-7: #9a9a9a;
+  --el-color-primary-light-9: #f3f3f3;
+  --el-border-radius-base: 0px;
+  --el-border-radius-small: 0px;
   --el-font-size-base: 14px;
-  --portal-ink: #142033;
-  --portal-muted: #68758a;
-  --portal-border: #dfe7ef;
-  --portal-canvas: #f3f6f8;
+  --portal-ink: #000000;
+  --portal-muted: #4d4d4d;
+  --portal-border: #000000;
+  --portal-canvas: #ffffff;
+  --dell-primary: #e91d2a;
+  --dell-yellow: #fcc20f;
+  --dell-purple: #6a26a4;
+  --dell-olive: #8e8a25;
+  --dell-sage: #b3bd95;
+  --dell-salmon: #d77a7a;
+  --dell-peach: #e6915d;
+  --dell-lime: #c0d4a7;
+  --dell-sky: #9ab6c8;
+  --dell-steel: #a5b8c0;
+  --dell-periwinkle: #8c9ae0;
+  --font-body: "Times New Roman", Times, serif;
+  --font-ui: Helvetica, Arial, sans-serif;
+  --font-display: "Arial Black", "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
 
 html {
@@ -30,17 +44,10 @@ body {
   overflow: hidden;
   overscroll-behavior: none;
   color: var(--portal-ink);
-  background:
-    linear-gradient(180deg, #f8fafc 0%, var(--portal-canvas) 46%, #eef3f8 100%),
-    var(--portal-canvas);
-  font-family:
-    "Microsoft YaHei",
-    "PingFang SC",
-    "Hiragino Sans GB",
-    "Segoe UI",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: #000000;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
   text-rendering: optimizeLegibility;
 }
 
@@ -55,6 +62,7 @@ input,
 select,
 textarea {
   font: inherit;
+  border-radius: 0;
 }
 
 button {
@@ -66,9 +74,19 @@ a {
   text-decoration: none;
 }
 
+img {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--dell-primary);
+  outline-offset: 2px;
+}
+
 ::selection {
-  color: #fff;
-  background: #1e63d6;
+  color: #ffffff;
+  background: var(--dell-primary);
 }
 
 #app {
@@ -81,5 +99,5 @@ a {
 }
 
 .el-scrollbar__thumb {
-  background-color: rgba(100, 116, 139, 0.38);
+  background-color: rgba(0, 0, 0, 0.38);
 }

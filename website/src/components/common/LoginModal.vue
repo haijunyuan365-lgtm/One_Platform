@@ -11,15 +11,15 @@
                 <ElIcon><Connection /></ElIcon>
               </div>
               <div class="brand-copy">
-                <strong>数创智联</strong>
-                <span>Digital Innovation Link</span>
+                <strong>公司一体化平台</strong>
+                <span>Project Portal</span>
               </div>
             </div>
 
             <div class="side-hero">
-              <span class="side-kicker">AI SOFTWARE COMPANY</span>
-              <h2>进入企业智能应用中枢</h2>
-              <p>统一访问项目门户、AI 工具链、交付资产与运营数据，让每一次登录都连接到更高效的数字化现场。</p>
+              <span class="side-kicker">1996 CATALOG SHELL</span>
+              <h2>进入内部目录册</h2>
+              <p>用一张扁平登录卡，打开项目、凭据与访问入口的统一目录。</p>
             </div>
 
             <div class="ai-visual" aria-hidden="true">
@@ -43,16 +43,16 @@
 
             <div class="side-stats">
               <div>
-                <strong>AI Copilot</strong>
-                <span>智能研发</span>
+                <strong>INDEX</strong>
+                <span>快速索引</span>
               </div>
               <div>
-                <strong>Data Hub</strong>
-                <span>数据治理</span>
+                <strong>NEW!</strong>
+                <span>目录更新</span>
               </div>
               <div>
-                <strong>DevOps</strong>
-                <span>持续交付</span>
+                <strong>SAFE</strong>
+                <span>受控访问</span>
               </div>
             </div>
           </aside>
@@ -67,9 +67,9 @@
                 <ElIcon><Lock /></ElIcon>
               </div>
               <div>
-                <span class="main-kicker">SECURE ACCESS</span>
-                <h1 id="login-title">智联身份登录</h1>
-                <p>使用数创智联账号访问项目门户</p>
+                <span class="main-kicker">ACCESS PASS</span>
+                <h1 id="login-title">目录访问登录</h1>
+                <p>使用账号进入项目门户目录册</p>
               </div>
             </div>
 
@@ -113,7 +113,7 @@
 
               <button type="submit" class="submit-btn" :disabled="loading">
                 <span v-if="loading" class="loading-dot"></span>
-                {{ loading ? '正在接入...' : '进入平台' }}
+                {{ loading ? '正在索引...' : '进入目录' }}
               </button>
             </form>
 
@@ -122,7 +122,7 @@
                 <span>演示账号</span>
                 <strong>admin / 123456</strong>
               </div>
-              <small>Portal Demo</small>
+              <small>DEMO</small>
             </div>
           </div>
         </section>
@@ -188,12 +188,7 @@ async function handleLogin() {
   place-items: center;
   padding: 0;
   overflow: hidden;
-  font-family:
-    "Microsoft YaHei",
-    "PingFang SC",
-    "HarmonyOS Sans SC",
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-body);
 }
 
 .login-layer::before,
@@ -206,23 +201,22 @@ async function handleLogin() {
 
 .login-layer::before {
   background-image:
-    linear-gradient(rgba(55, 229, 206, 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(55, 229, 206, 0.07) 1px, transparent 1px),
-    linear-gradient(128deg, transparent 0 64%, rgba(245, 183, 69, 0.12) 64.2% 64.7%, transparent 65%),
-    linear-gradient(38deg, transparent 0 70%, rgba(44, 151, 255, 0.12) 70.2% 70.7%, transparent 71%);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 20% 30%, rgba(252, 194, 15, 0.18), transparent 22%),
+    radial-gradient(circle at 80% 70%, rgba(233, 29, 42, 0.16), transparent 20%);
   background-position:
     center,
     center,
     0 0,
     0 0;
   background-size:
-    54px 54px,
-    54px 54px,
+    40px 40px,
+    40px 40px,
     100% 100%,
     100% 100%;
-  mask-image: linear-gradient(180deg, transparent, #000 16%, #000 82%, transparent);
-  opacity: 0.9;
-  animation: gridDrift 18s linear infinite;
+  opacity: 0.65;
+  animation: gridDrift 22s linear infinite;
 }
 
 .login-layer::after {
@@ -230,14 +224,13 @@ async function handleLogin() {
     repeating-linear-gradient(
       180deg,
       transparent 0,
-      transparent 17px,
-      rgba(255, 255, 255, 0.035) 18px,
-      transparent 19px
+      transparent 18px,
+      rgba(255, 255, 255, 0.03) 19px,
+      transparent 20px
     );
-  mix-blend-mode: screen;
-  opacity: 0.54;
+  opacity: 0.4;
   transform: translateY(-2%);
-  animation: scanMove 7s ease-in-out infinite;
+  animation: scanMove 8s ease-in-out infinite;
 }
 
 .login-backdrop {
@@ -245,9 +238,8 @@ async function handleLogin() {
   inset: 0;
   border: 0;
   background:
-    linear-gradient(115deg, rgba(5, 10, 20, 0.92), rgba(9, 34, 40, 0.88) 44%, rgba(31, 27, 22, 0.9)),
-    #07101b;
-  backdrop-filter: blur(16px);
+    linear-gradient(115deg, rgba(0, 0, 0, 0.94), rgba(32, 32, 32, 0.92) 42%, rgba(0, 0, 0, 0.95)),
+    #000;
 }
 
 .login-panel {
@@ -256,7 +248,7 @@ async function handleLogin() {
   width: 100%;
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: minmax(480px, 1fr) minmax(430px, 560px);
+  grid-template-columns: minmax(460px, 1fr) minmax(420px, 520px);
   overflow: hidden;
   background: transparent;
   box-shadow: none;
@@ -269,19 +261,19 @@ async function handleLogin() {
   justify-content: space-between;
   gap: 28px;
   min-width: 0;
-  padding: 64px 72px 58px;
+  padding: 62px 64px 54px;
   overflow: hidden;
-  color: #fff;
+  color: #000;
   background:
-    linear-gradient(90deg, rgba(3, 12, 21, 0.58), rgba(3, 12, 21, 0.22) 56%, transparent),
-    linear-gradient(145deg, rgba(8, 42, 47, 0.46), rgba(37, 31, 22, 0.26));
+    linear-gradient(90deg, rgba(179, 189, 149, 0.9), rgba(255, 255, 255, 0.9) 50%, rgba(214, 122, 122, 0.92)),
+    #fff;
+  border-right: 4px solid #000;
 }
 
 .login-side::before {
   position: absolute;
-  inset: 42px 48px;
-  border: 1px solid rgba(148, 231, 212, 0.16);
-  border-radius: 8px;
+  inset: 36px 36px 30px;
+  border: 3px solid #000;
   content: "";
   pointer-events: none;
 }
@@ -291,11 +283,11 @@ async function handleLogin() {
   inset: auto -16% -18% 12%;
   height: 34%;
   background:
-    linear-gradient(90deg, rgba(50, 220, 191, 0.18), rgba(255, 195, 84, 0.12), transparent);
+    linear-gradient(90deg, rgba(233, 29, 42, 0.18), rgba(252, 194, 15, 0.18), transparent);
   content: "";
-  filter: blur(28px);
-  opacity: 0.72;
-  transform: rotate(-7deg);
+  filter: blur(24px);
+  opacity: 0.55;
+  transform: rotate(-6deg);
   pointer-events: none;
 }
 
@@ -319,14 +311,16 @@ async function handleLogin() {
 }
 
 .brand-copy strong {
-  color: #f8fbff;
+  color: #000;
   font-size: 20px;
   line-height: 1.15;
+  font-family: var(--font-display);
   font-weight: 900;
+  text-transform: uppercase;
 }
 
 .brand-copy span {
-  color: rgba(178, 247, 228, 0.74);
+  color: #333;
   font-size: 12px;
   font-weight: 700;
 }
@@ -337,27 +331,24 @@ async function handleLogin() {
   height: 48px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 0;
 }
 
 .side-mark {
   flex: 0 0 auto;
-  border: 1px solid rgba(137, 244, 221, 0.36);
-  color: #dffef6;
-  background:
-    linear-gradient(145deg, rgba(67, 224, 195, 0.2), rgba(43, 106, 255, 0.18)),
-    rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 16px 30px rgba(0, 0, 0, 0.26),
-    0 0 28px rgba(48, 226, 197, 0.14);
+  border: 2px solid #000;
+  color: #000;
+  background: #fcc20f;
+  box-shadow: 3px 3px 0 #000;
 }
 
 .side-kicker {
   display: block;
   margin-bottom: 14px;
-  color: #76f2d8;
+  color: #000;
   font-size: 12px;
   font-weight: 800;
+  text-transform: uppercase;
 }
 
 .login-side h2,
@@ -368,17 +359,18 @@ async function handleLogin() {
 
 .login-side h2 {
   max-width: 620px;
-  color: #ffffff;
+  color: #000;
   font-size: 44px;
   line-height: 1.18;
+  font-family: var(--font-display);
   font-weight: 900;
-  text-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+  text-transform: uppercase;
 }
 
 .login-side p {
   max-width: 560px;
   margin-top: 12px;
-  color: rgba(224, 241, 246, 0.76);
+  color: #111;
   font-size: 14px;
   line-height: 1.9;
 }
@@ -387,17 +379,16 @@ async function handleLogin() {
   width: min(560px, 100%);
   height: 222px;
   margin: 4px 0 0;
-  border: 1px solid rgba(138, 237, 217, 0.2);
-  border-radius: 8px;
+  border: 3px solid #000;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(3, 18, 30, 0.76), rgba(15, 65, 68, 0.58));
+    linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(245, 238, 202, 0.96));
   background-size:
     28px 28px,
     28px 28px,
     auto;
-  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.2) inset;
+  box-shadow: 6px 6px 0 #000;
 }
 
 .ai-core {
@@ -406,14 +397,11 @@ async function handleLogin() {
   left: 50%;
   width: 92px;
   height: 92px;
-  border: 1px solid rgba(125, 245, 224, 0.42);
-  border-radius: 8px;
+  border: 3px solid #000;
+  border-radius: 0;
   background:
-    linear-gradient(145deg, rgba(120, 250, 229, 0.24), rgba(255, 200, 86, 0.12)),
-    rgba(8, 24, 35, 0.86);
-  box-shadow:
-    0 0 0 10px rgba(125, 245, 224, 0.04),
-    0 24px 42px rgba(0, 0, 0, 0.26);
+    linear-gradient(145deg, rgba(252, 194, 15, 0.95), rgba(233, 29, 42, 0.94));
+  box-shadow: 6px 6px 0 #000;
   transform: translateX(-50%) rotate(45deg);
   animation: corePulse 3.8s ease-in-out infinite;
 }
@@ -422,27 +410,27 @@ async function handleLogin() {
 .ai-core i {
   position: absolute;
   inset: 18px;
-  border-radius: 8px;
+  border-radius: 0;
   content: "";
 }
 
 .ai-core span {
-  border: 1px solid rgba(255, 255, 255, 0.42);
+  border: 2px solid #000;
 }
 
 .ai-core i {
   inset: 30px;
   display: block;
-  background: #7ff7e2;
-  box-shadow: 0 0 22px rgba(127, 247, 226, 0.85);
+  background: #fff;
+  box-shadow: 0 0 0 2px #000 inset;
 }
 
 .trace {
   position: absolute;
   height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, #7ff7e2, #ffc857, transparent);
-  opacity: 0.72;
+  border-radius: 0;
+  background: linear-gradient(90deg, transparent, #000, #e91d2a, transparent);
+  opacity: 0.8;
   transform-origin: center;
   animation: traceFlow 3.2s ease-in-out infinite;
 }
@@ -473,10 +461,10 @@ async function handleLogin() {
   position: absolute;
   width: 12px;
   height: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  border-radius: 999px;
-  background: #0f2f37;
-  box-shadow: 0 0 18px rgba(127, 247, 226, 0.75);
+  border: 2px solid #000;
+  border-radius: 0;
+  background: #fcc20f;
+  box-shadow: 3px 3px 0 #000;
   animation: nodeBlink 2.4s ease-in-out infinite;
 }
 
@@ -508,8 +496,8 @@ async function handleLogin() {
 
 .data-stack span {
   height: 5px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(127, 247, 226, 0.92), rgba(255, 200, 87, 0.72));
+  border-radius: 0;
+  background: linear-gradient(90deg, #000, #e91d2a, #fcc20f);
 }
 
 .data-stack span:nth-child(2) {
@@ -538,21 +526,19 @@ async function handleLogin() {
   justify-content: center;
   gap: 7px;
   padding: 13px;
-  border: 1px solid rgba(178, 247, 228, 0.2);
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.06)),
-    rgba(255, 255, 255, 0.04);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.14);
+  border: 2px solid #000;
+  background: #fff;
+  box-shadow: 3px 3px 0 #000;
 }
 
 .side-stats strong {
-  color: #ffffff;
+  color: #000;
   font-size: 13px;
+  text-transform: uppercase;
 }
 
 .side-stats span {
-  color: rgba(224, 241, 246, 0.68);
+  color: #333;
   font-size: 12px;
 }
 
@@ -562,27 +548,24 @@ async function handleLogin() {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 72px 58px 44px;
+  padding: 64px 50px 42px;
   overflow: hidden;
-  border-left: 1px solid rgba(166, 236, 222, 0.22);
+  border-left: 4px solid #000;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(230, 245, 246, 0.86)),
-    rgba(247, 251, 252, 0.82);
-  backdrop-filter: blur(24px);
-  box-shadow:
-    -28px 0 90px rgba(0, 0, 0, 0.22),
-    1px 0 0 rgba(255, 255, 255, 0.72) inset;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 238, 202, 0.9)),
+    #fff;
+  box-shadow: -8px 0 0 #000;
 }
 
 .login-main::before {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(18, 103, 126, 0.06) 1px, transparent 1px),
-    linear-gradient(rgba(18, 103, 126, 0.045) 1px, transparent 1px);
+    linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px);
   background-size: 34px 34px;
   content: "";
-  opacity: 0.58;
+  opacity: 0.45;
   pointer-events: none;
 }
 
@@ -592,7 +575,7 @@ async function handleLogin() {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #34e7c2, #2c7dff, #ffc857);
+  background: linear-gradient(90deg, #000, #e91d2a, #fcc20f);
   content: "";
 }
 
@@ -602,8 +585,8 @@ async function handleLogin() {
   z-index: 1;
   display: inline-grid;
   place-items: center;
-  border: 0;
-  border-radius: 8px;
+  border: 2px solid #000;
+  border-radius: 0;
   cursor: pointer;
   font: inherit;
 }
@@ -614,9 +597,9 @@ async function handleLogin() {
   right: 16px;
   width: 42px;
   height: 42px;
-  color: #425064;
-  background: rgba(255, 255, 255, 0.76);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  color: #000;
+  background: #fcc20f;
+  box-shadow: 3px 3px 0 #000;
   transition:
     color 0.16s ease,
     background 0.16s ease,
@@ -625,9 +608,9 @@ async function handleLogin() {
 
 .close-btn:hover,
 .icon-btn:hover {
-  color: #081523;
-  background: #e9f3f5;
-  transform: translateY(-1px);
+  color: #000;
+  background: #e91d2a;
+  transform: translate(-1px, -1px);
 }
 
 .login-heading {
@@ -641,33 +624,32 @@ async function handleLogin() {
 }
 
 .heading-icon {
-  color: #fff;
-  background:
-    linear-gradient(145deg, #1238a8, #18bfa5 78%),
-    #1e63d6;
-  box-shadow:
-    0 18px 34px rgba(24, 191, 165, 0.25),
-    0 0 0 8px rgba(24, 191, 165, 0.08);
+  color: #000;
+  background: #fcc20f;
+  box-shadow: 3px 3px 0 #000;
 }
 
 .main-kicker {
   display: block;
   margin-bottom: 5px;
-  color: #0f8f78;
+  color: #000;
   font-size: 12px;
   font-weight: 900;
+  text-transform: uppercase;
 }
 
 .login-heading h1 {
-  color: #101a2b;
+  color: #000;
   font-size: 28px;
   line-height: 1.2;
+  font-family: var(--font-display);
   font-weight: 900;
+  text-transform: uppercase;
 }
 
 .login-heading p {
   margin: 4px 0 0;
-  color: #5d6b7f;
+  color: #222;
   font-size: 13px;
 }
 
@@ -682,7 +664,7 @@ async function handleLogin() {
 .form-field {
   display: grid;
   gap: 8px;
-  color: #182438;
+  color: #000;
   font-size: 13px;
   font-weight: 900;
 }
@@ -693,13 +675,11 @@ async function handleLogin() {
   align-items: center;
   gap: 11px;
   padding: 0 14px;
-  border: 1px solid rgba(139, 161, 183, 0.34);
-  border-radius: 8px;
-  color: #607088;
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 14px 32px rgba(16, 36, 54, 0.06);
+  border: 2px solid #000;
+  border-radius: 0;
+  color: #000;
+  background: #fff;
+  box-shadow: 3px 3px 0 #000;
   transition:
     background 0.16s ease,
     border-color 0.16s ease,
@@ -708,12 +688,9 @@ async function handleLogin() {
 }
 
 .input-shell:focus-within {
-  border-color: #19bfa5;
   background: #fff;
-  box-shadow:
-    0 0 0 4px rgba(25, 191, 165, 0.12),
-    0 18px 38px rgba(16, 36, 54, 0.1);
-  transform: translateY(-1px);
+  box-shadow: 4px 4px 0 #000;
+  transform: translate(-1px, -1px);
 }
 
 .input-shell input {
@@ -721,34 +698,33 @@ async function handleLogin() {
   flex: 1;
   border: 0;
   outline: 0;
-  color: #101a2b;
+  color: #000;
   background: transparent;
   font: inherit;
   font-weight: 700;
 }
 
 .input-shell input::placeholder {
-  color: #94a1b4;
+  color: #555;
 }
 
 .icon-btn {
   width: 30px;
   height: 30px;
   flex: 0 0 auto;
-  color: #607088;
+  color: #000;
   background: transparent;
 }
 
 .form-field em {
-  color: #b42318;
+  color: #e91d2a;
   font-size: 12px;
   font-style: normal;
   font-weight: 700;
 }
 
 .form-field.error .input-shell {
-  border-color: #f19b84;
-  background: #fff8f4;
+  background: #fff1ed;
 }
 
 .error-banner {
@@ -756,10 +732,10 @@ async function handleLogin() {
   display: flex;
   align-items: center;
   padding: 8px 12px;
-  border: 1px solid #ffd6cf;
-  border-radius: 8px;
-  color: #b42318;
-  background: #fff7f4;
+  border: 2px solid #000;
+  border-radius: 0;
+  color: #000;
+  background: #d77a7a;
   font-size: 13px;
   font-weight: 700;
 }
@@ -773,15 +749,11 @@ async function handleLogin() {
   justify-content: center;
   gap: 8px;
   overflow: hidden;
-  border: 0;
-  border-radius: 8px;
+  border: 2px solid #000;
+  border-radius: 0;
   color: #fff;
-  background:
-    linear-gradient(90deg, #0d58d5, #11bfa3 54%, #f0a62e),
-    #0d58d5;
-  box-shadow:
-    0 18px 34px rgba(13, 88, 213, 0.24),
-    0 10px 26px rgba(17, 191, 163, 0.16);
+  background: #e91d2a;
+  box-shadow: 4px 4px 0 #000;
   cursor: pointer;
   font: inherit;
   font-size: 15px;
@@ -796,7 +768,7 @@ async function handleLogin() {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: linear-gradient(110deg, transparent 0 34%, rgba(255, 255, 255, 0.36) 42%, transparent 52%);
+  background: linear-gradient(110deg, transparent 0 34%, rgba(255, 255, 255, 0.28) 42%, transparent 52%);
   content: "";
   pointer-events: none;
   transform: translateX(-115%);
@@ -804,11 +776,9 @@ async function handleLogin() {
 }
 
 .submit-btn:hover:not(:disabled) {
-  filter: saturate(1.1);
-  box-shadow:
-    0 22px 42px rgba(13, 88, 213, 0.28),
-    0 12px 30px rgba(17, 191, 163, 0.2);
-  transform: translateY(-1px);
+  filter: saturate(1.05);
+  box-shadow: 6px 6px 0 #000;
+  transform: translate(-1px, -1px);
 }
 
 .submit-btn:hover:not(:disabled)::before {
@@ -823,9 +793,9 @@ async function handleLogin() {
 .loading-dot {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.45);
   border-top-color: #fff;
-  border-radius: 999px;
+  border-radius: 0;
   animation: rotate 0.8s linear infinite;
 }
 
@@ -840,13 +810,11 @@ async function handleLogin() {
   gap: 12px;
   margin-top: 20px;
   padding: 10px 14px;
-  border: 1px solid rgba(138, 161, 183, 0.28);
-  border-radius: 8px;
-  color: #5d6b7f;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.84), rgba(231, 246, 244, 0.78)),
-    #f6fbfc;
-  box-shadow: 0 14px 32px rgba(16, 36, 54, 0.06);
+  border: 2px solid #000;
+  border-radius: 0;
+  color: #000;
+  background: #fff;
+  box-shadow: 3px 3px 0 #000;
   font-size: 13px;
 }
 
@@ -856,7 +824,7 @@ async function handleLogin() {
 }
 
 .demo-account strong {
-  color: #101a2b;
+  color: #000;
   font-size: 16px;
   font-weight: 900;
 }
@@ -864,11 +832,13 @@ async function handleLogin() {
 .demo-account small {
   flex: 0 0 auto;
   padding: 4px 8px;
-  border-radius: 999px;
-  color: #0f8f78;
-  background: rgba(25, 191, 165, 0.1);
+  border: 2px solid #000;
+  border-radius: 0;
+  color: #000;
+  background: #fcc20f;
   font-size: 12px;
   font-weight: 900;
+  text-transform: uppercase;
 }
 
 .modal-enter-active,
@@ -914,24 +884,22 @@ async function handleLogin() {
 
 @keyframes corePulse {
   50% {
-    box-shadow:
-      0 0 0 16px rgba(125, 245, 224, 0.06),
-      0 30px 52px rgba(0, 0, 0, 0.3);
-    transform: translateX(-50%) rotate(45deg) scale(1.04);
+    box-shadow: 8px 8px 0 #000;
+    transform: translateX(-50%) rotate(45deg) scale(1.03);
   }
 }
 
 @keyframes traceFlow {
   50% {
     opacity: 1;
-    filter: drop-shadow(0 0 9px rgba(127, 247, 226, 0.72));
+    filter: none;
   }
 }
 
 @keyframes nodeBlink {
   50% {
-    background: #ffc857;
-    box-shadow: 0 0 20px rgba(255, 200, 87, 0.82);
+    background: #e91d2a;
+    box-shadow: 4px 4px 0 #000;
   }
 }
 
@@ -963,9 +931,9 @@ async function handleLogin() {
   .login-main {
     min-height: 480px;
     padding: 58px 24px 28px;
-    border-top: 1px solid rgba(166, 236, 222, 0.18);
+    border-top: 4px solid #000;
     border-left: 0;
-    box-shadow: 0 -28px 70px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 -6px 0 #000;
   }
 }
 

@@ -13,9 +13,14 @@
 
       <div class="header-spacer"></div>
 
+      <div class="hotline-callout">
+        <span>支持热线</span>
+        <strong>400-1996-2026</strong>
+      </div>
+
       <div class="platform-state">
         <span></span>
-        内部门户
+        目录索引
       </div>
 
       <div class="header-actions">
@@ -132,28 +137,24 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
   left: 0;
   right: 0;
   z-index: 50;
-  border-bottom: 1px solid transparent;
-  background: rgba(244, 247, 250, 0.76);
-  backdrop-filter: blur(18px);
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    box-shadow 0.2s ease;
+  border-bottom: 4px solid #000;
+  background: #000;
+  color: #fff;
+  box-shadow: 0 8px 0 #000;
+  transition: box-shadow 0.2s ease;
 }
 
 .app-header.scrolled {
-  border-color: rgba(203, 213, 225, 0.86);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 0 #000, 0 16px 26px rgba(0, 0, 0, 0.18);
 }
 
 .header-inner {
   width: 100%;
-  height: 70px;
+  min-height: 68px;
   display: flex;
   align-items: center;
-  gap: 22px;
-  padding: 0 24px;
+  gap: 14px;
+  padding: 0 18px;
 }
 
 .brand-link,
@@ -167,9 +168,9 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 .brand-link {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
-  min-width: 224px;
-  color: #142033;
+  gap: 10px;
+  min-width: 236px;
+  color: #fff;
 }
 
 .brand-mark {
@@ -177,13 +178,10 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
   height: 38px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(18, 66, 118, 0.16);
-  border-radius: 8px;
-  color: #fff;
-  background:
-    linear-gradient(145deg, #133858, #1e63d6 62%, #2bb18a),
-    #1e63d6;
-  box-shadow: 0 12px 24px rgba(30, 99, 214, 0.2);
+  border: 2px solid #fff;
+  color: #000;
+  background: #fcc20f;
+  box-shadow: 3px 3px 0 #e91d2a;
 }
 
 .brand-copy {
@@ -192,16 +190,19 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 }
 
 .brand-copy strong {
-  color: #142033;
+  color: #fff;
   font-size: 15px;
   line-height: 1.2;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .brand-copy small,
 .user-meta small,
 .dropdown-profile small {
-  color: #718096;
+  color: #d7d7d7;
   font-size: 12px;
 }
 
@@ -216,26 +217,55 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
   gap: 10px;
 }
 
+.hotline-callout {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 12px;
+  border: 2px solid #fff;
+  color: #fff;
+  background: #e91d2a;
+  box-shadow: 3px 3px 0 #000;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hotline-callout span {
+  padding: 2px 6px;
+  color: #000;
+  background: #fcc20f;
+  font-weight: 900;
+}
+
+.hotline-callout strong {
+  color: #fff;
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
 .platform-state {
   height: 32px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 0 10px;
-  border: 1px solid rgba(43, 177, 138, 0.22);
-  border-radius: 8px;
-  color: #0b7a55;
-  background: rgba(228, 248, 239, 0.72);
+  border: 2px solid #fff;
+  color: #000;
+  background: #fcc20f;
   font-size: 12px;
   font-weight: 800;
+  text-transform: uppercase;
 }
 
 .platform-state span {
   width: 7px;
   height: 7px;
-  border-radius: 999px;
-  background: #2bb18a;
-  box-shadow: 0 0 0 4px rgba(43, 177, 138, 0.16);
+  border-radius: 0;
+  background: #e91d2a;
+  box-shadow: 0 0 0 2px #000;
 }
 
 button {
@@ -248,20 +278,20 @@ button {
 .admin-btn,
 .user-trigger {
   height: 40px;
-  border-radius: 8px;
   font-size: 14px;
   font-weight: 700;
 }
 
 .text-btn {
   padding: 0 14px;
-  color: #526078;
-  background: transparent;
+  color: #fff;
+  background: #000;
+  border: 2px solid #fff;
 }
 
 .text-btn:hover {
-  color: #142033;
-  background: rgba(15, 23, 42, 0.06);
+  color: #000;
+  background: #fcc20f;
 }
 
 .admin-btn {
@@ -269,17 +299,16 @@ button {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  color: #fff;
-  background: #1e63d6;
-  box-shadow: 0 12px 24px rgba(30, 99, 214, 0.2);
-}
-
-.admin-btn {
   padding: 0 15px;
+  color: #fff;
+  background: #e91d2a;
+  border: 2px solid #fff;
+  box-shadow: 3px 3px 0 #000;
 }
 
 .admin-btn:hover {
-  background: #174fba;
+  color: #000;
+  background: #fcc20f;
 }
 
 .user-menu {
@@ -291,9 +320,9 @@ button {
   align-items: center;
   gap: 9px;
   padding: 0 10px 0 6px;
-  color: #142033;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(203, 213, 225, 0.78);
+  color: #fff;
+  background: #000;
+  border: 2px solid #fff;
 }
 
 .avatar {
@@ -302,9 +331,9 @@ button {
   display: grid;
   place-items: center;
   overflow: hidden;
-  border-radius: 8px;
-  color: #fff;
-  background: #17324d;
+  border-radius: 0;
+  color: #000;
+  background: #fcc20f;
   font-size: 13px;
   font-weight: 800;
 }
@@ -329,14 +358,14 @@ button {
 .user-meta strong {
   max-width: 96px;
   overflow: hidden;
-  color: #142033;
+  color: #fff;
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .arrow-icon {
-  color: #718096;
+  color: #fcc20f;
   transition: transform 0.18s ease;
 }
 
@@ -350,10 +379,9 @@ button {
   right: 0;
   width: 240px;
   padding: 8px;
-  border: 1px solid #dfe7ef;
-  border-radius: 8px;
+  border: 3px solid #000;
   background: #fff;
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.16);
+  box-shadow: 6px 6px 0 #000;
 }
 
 .dropdown-profile {
@@ -364,7 +392,7 @@ button {
 
 .dropdown-profile {
   padding: 10px;
-  border-bottom: 1px solid #edf1f5;
+  border-bottom: 2px solid #000;
   margin-bottom: 6px;
 }
 
@@ -372,7 +400,7 @@ button {
   display: block;
   max-width: 152px;
   overflow: hidden;
-  color: #142033;
+  color: #000;
   font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -385,24 +413,25 @@ button {
   align-items: center;
   gap: 9px;
   padding: 0 10px;
-  border-radius: 8px;
-  color: #526078;
+  border: 2px solid transparent;
+  color: #000;
   background: transparent;
   font-size: 14px;
   text-align: left;
 }
 
 .dropdown-item:hover {
-  color: #142033;
-  background: #f3f6f8;
+  border-color: #000;
+  background: #fcc20f;
 }
 
 .dropdown-item.danger {
-  color: #b42318;
+  color: #e91d2a;
 }
 
 .dropdown-item.danger:hover {
-  background: #fff1ed;
+  color: #000;
+  background: #e91d2a;
 }
 
 .menu-pop-enter-active,
@@ -421,7 +450,8 @@ button {
 @media (max-width: 840px) {
   .header-inner {
     height: 64px;
-    padding: 0 14px;
+    gap: 8px;
+    padding: 0 12px;
   }
 
   .brand-link {

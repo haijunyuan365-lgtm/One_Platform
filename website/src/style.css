@@ -1,18 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  --el-color-primary: #1e63d6;
-  --el-color-primary-light-3: #4f86e6;
-  --el-color-primary-light-5: #8fb3ef;
-  --el-color-primary-light-7: #c6d8f7;
-  --el-color-primary-light-9: #edf4ff;
+  --el-color-primary: #0075de;
+  --el-color-primary-light-3: #3c97e5;
+  --el-color-primary-light-5: #6bb1eb;
+  --el-color-primary-light-7: #b9d8f6;
+  --el-color-primary-light-9: #edf6fd;
   --el-border-radius-base: 8px;
-  --el-border-radius-small: 6px;
-  --el-font-size-base: 14px;
-  --portal-ink: #142033;
-  --portal-muted: #68758a;
-  --portal-border: #dfe7ef;
-  --portal-canvas: #f3f6f8;
+  --el-border-radius-small: 5px;
+  --el-font-size-base: 15px;
+  --portal-primary: #0075de;
+  --portal-primary-active: #005bab;
+  --portal-secondary: #213183;
+  --portal-canvas: #f6f5f4;
+  --portal-surface: #ffffff;
+  --portal-ink: #000000;
+  --portal-ink-soft: #31302e;
+  --portal-muted: #615d59;
+  --portal-faint: #a39e98;
+  --portal-hairline: #e6e6e6;
+  --portal-sky: #62aef0;
+  --portal-purple: #d6b6f6;
+  --portal-pink: #ff64c8;
+  --portal-orange: #dd5b00;
+  --portal-teal: #2a9d99;
+  --portal-green: #1aae39;
+  --portal-radius-xs: 4px;
+  --portal-radius-sm: 5px;
+  --portal-radius-md: 8px;
+  --portal-radius-lg: 12px;
+  --portal-radius-xl: 16px;
+  --portal-radius-full: 9999px;
+  --portal-shadow-soft:
+    rgba(0, 0, 0, 0.01) 0 0.175px 1.041px,
+    rgba(0, 0, 0, 0.02) 0 0.8px 2.925px,
+    rgba(0, 0, 0, 0.027) 0 2.025px 7.847px,
+    rgba(0, 0, 0, 0.04) 0 4px 18px;
+  --portal-shadow-elevated:
+    rgba(0, 0, 0, 0.015) 0 1px 2px,
+    rgba(0, 0, 0, 0.03) 0 8px 20px,
+    rgba(0, 0, 0, 0.05) 0 23px 52px;
+  --portal-max-width: 1180px;
 }
 
 html {
@@ -29,15 +57,18 @@ body {
   padding: 0;
   overflow: hidden;
   overscroll-behavior: none;
-  color: var(--portal-ink);
+  color: var(--portal-ink-soft);
   background:
-    linear-gradient(180deg, #f8fafc 0%, var(--portal-canvas) 46%, #eef3f8 100%),
+    radial-gradient(circle at 10% 12%, rgba(214, 182, 246, 0.24), transparent 18%),
+    radial-gradient(circle at 88% 10%, rgba(98, 174, 240, 0.18), transparent 16%),
+    linear-gradient(180deg, #fbfaf8 0%, var(--portal-canvas) 42%, #f3f1ee 100%),
     var(--portal-canvas);
   font-family:
-    "Microsoft YaHei",
+    "Inter",
+    "Segoe UI",
     "PingFang SC",
     "Hiragino Sans GB",
-    "Segoe UI",
+    "Microsoft YaHei",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -59,16 +90,28 @@ textarea {
 
 button {
   -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+  transition: color 0.18s ease;
 }
 
 ::selection {
   color: #fff;
-  background: #1e63d6;
+  background: var(--portal-primary);
+}
+
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--portal-primary) 60%, transparent);
+  outline-offset: 2px;
 }
 
 #app {
@@ -81,5 +124,10 @@ a {
 }
 
 .el-scrollbar__thumb {
-  background-color: rgba(100, 116, 139, 0.38);
+  background-color: rgba(97, 93, 89, 0.34);
+}
+
+.el-scrollbar__bar.is-horizontal .el-scrollbar__thumb,
+.el-scrollbar__bar.is-vertical .el-scrollbar__thumb {
+  border-radius: 999px;
 }

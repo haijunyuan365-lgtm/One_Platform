@@ -133,7 +133,7 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
   right: 0;
   z-index: 50;
   border-bottom: 1px solid transparent;
-  background: rgba(244, 247, 250, 0.76);
+  background: rgba(246, 245, 244, 0.8);
   backdrop-filter: blur(18px);
   transition:
     border-color 0.2s ease,
@@ -142,18 +142,18 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 }
 
 .app-header.scrolled {
-  border-color: rgba(203, 213, 225, 0.86);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  border-color: var(--portal-hairline);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--portal-shadow-soft);
 }
 
 .header-inner {
-  width: 100%;
-  height: 70px;
+  width: min(var(--portal-max-width), calc(100% - 32px));
+  height: 72px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 22px;
-  padding: 0 24px;
+  gap: 18px;
 }
 
 .brand-link,
@@ -167,41 +167,53 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 .brand-link {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
-  min-width: 224px;
-  color: #142033;
+  gap: 12px;
+  min-width: 232px;
+  color: var(--portal-ink-soft);
 }
 
 .brand-mark {
-  width: 38px;
-  height: 38px;
+  position: relative;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(18, 66, 118, 0.16);
-  border-radius: 8px;
-  color: #fff;
-  background:
-    linear-gradient(145deg, #133858, #1e63d6 62%, #2bb18a),
-    #1e63d6;
-  box-shadow: 0 12px 24px rgba(30, 99, 214, 0.2);
+  border: 1px solid var(--portal-hairline);
+  border-radius: 12px;
+  color: var(--portal-ink-soft);
+  background: #fff;
+  box-shadow: var(--portal-shadow-soft);
+}
+
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--portal-primary);
+  box-shadow: 0 0 0 5px rgba(0, 117, 222, 0.1);
 }
 
 .brand-copy {
   display: grid;
-  gap: 2px;
+  gap: 3px;
 }
 
 .brand-copy strong {
-  color: #142033;
+  color: var(--portal-ink);
   font-size: 15px;
   line-height: 1.2;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .brand-copy small,
 .user-meta small,
 .dropdown-profile small {
-  color: #718096;
+  color: var(--portal-faint);
   font-size: 12px;
 }
 
@@ -217,25 +229,26 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 }
 
 .platform-state {
-  height: 32px;
+  height: 34px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 0 10px;
-  border: 1px solid rgba(43, 177, 138, 0.22);
-  border-radius: 8px;
-  color: #0b7a55;
-  background: rgba(228, 248, 239, 0.72);
+  padding: 0 12px;
+  border: 1px solid rgba(0, 117, 222, 0.14);
+  border-radius: 999px;
+  color: var(--portal-primary);
+  background: rgba(255, 255, 255, 0.88);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
+  box-shadow: var(--portal-shadow-soft);
 }
 
 .platform-state span {
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: #2bb18a;
-  box-shadow: 0 0 0 4px rgba(43, 177, 138, 0.16);
+  background: var(--portal-primary);
+  box-shadow: 0 0 0 4px rgba(0, 117, 222, 0.12);
 }
 
 button {
@@ -248,20 +261,20 @@ button {
 .admin-btn,
 .user-trigger {
   height: 40px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .text-btn {
   padding: 0 14px;
-  color: #526078;
+  color: var(--portal-ink-soft);
   background: transparent;
 }
 
 .text-btn:hover {
-  color: #142033;
-  background: rgba(15, 23, 42, 0.06);
+  color: var(--portal-ink);
+  background: rgba(255, 255, 255, 0.78);
 }
 
 .admin-btn {
@@ -270,16 +283,14 @@ button {
   justify-content: center;
   gap: 7px;
   color: #fff;
-  background: #1e63d6;
-  box-shadow: 0 12px 24px rgba(30, 99, 214, 0.2);
-}
-
-.admin-btn {
+  background: var(--portal-primary);
   padding: 0 15px;
+  box-shadow: 0 12px 26px rgba(0, 117, 222, 0.18);
 }
 
 .admin-btn:hover {
-  background: #174fba;
+  background: var(--portal-primary-active);
+  transform: translateY(-1px);
 }
 
 .user-menu {
@@ -291,9 +302,10 @@ button {
   align-items: center;
   gap: 9px;
   padding: 0 10px 0 6px;
-  color: #142033;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(203, 213, 225, 0.78);
+  color: var(--portal-ink-soft);
+  border: 1px solid var(--portal-hairline);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--portal-shadow-soft);
 }
 
 .avatar {
@@ -302,11 +314,11 @@ button {
   display: grid;
   place-items: center;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #fff;
-  background: #17324d;
+  background: var(--portal-secondary);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .avatar img {
@@ -318,6 +330,7 @@ button {
 .avatar-large {
   width: 40px;
   height: 40px;
+  border-radius: 12px;
 }
 
 .user-meta {
@@ -329,14 +342,14 @@ button {
 .user-meta strong {
   max-width: 96px;
   overflow: hidden;
-  color: #142033;
+  color: var(--portal-ink-soft);
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .arrow-icon {
-  color: #718096;
+  color: var(--portal-faint);
   transition: transform 0.18s ease;
 }
 
@@ -350,21 +363,18 @@ button {
   right: 0;
   width: 240px;
   padding: 8px;
-  border: 1px solid #dfe7ef;
-  border-radius: 8px;
+  border: 1px solid var(--portal-hairline);
+  border-radius: 16px;
   background: #fff;
-  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.16);
+  box-shadow: var(--portal-shadow-elevated);
 }
 
 .dropdown-profile {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.dropdown-profile {
   padding: 10px;
-  border-bottom: 1px solid #edf1f5;
+  border-bottom: 1px solid #f0ece8;
   margin-bottom: 6px;
 }
 
@@ -372,7 +382,7 @@ button {
   display: block;
   max-width: 152px;
   overflow: hidden;
-  color: #142033;
+  color: var(--portal-ink-soft);
   font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -385,16 +395,16 @@ button {
   align-items: center;
   gap: 9px;
   padding: 0 10px;
-  border-radius: 8px;
-  color: #526078;
+  border-radius: 12px;
+  color: var(--portal-muted);
   background: transparent;
   font-size: 14px;
   text-align: left;
 }
 
 .dropdown-item:hover {
-  color: #142033;
-  background: #f3f6f8;
+  color: var(--portal-ink-soft);
+  background: #f7f5f2;
 }
 
 .dropdown-item.danger {
@@ -420,8 +430,8 @@ button {
 
 @media (max-width: 840px) {
   .header-inner {
-    height: 64px;
-    padding: 0 14px;
+    width: calc(100% - 24px);
+    height: 66px;
   }
 
   .brand-link {
@@ -441,7 +451,7 @@ button {
   }
 
   .text-btn {
-    padding: 0 8px;
+    padding: 0 10px;
   }
 
   .admin-btn {
